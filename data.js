@@ -181,7 +181,7 @@ window.PORTFOLIO = {
         { name: "Tools & Platforms",    items: ["Bloomberg", "Capital IQ", "FactSet", "Microsoft Excel", "Microsoft PowerPoint", "Microsoft Office 365"] },
         { name: "Programming",          items: ["HTML", "CSS", "JavaScript"] },
         { name: "Professional",         items: ["Pitching & Public Speaking", "Client Relationships", "Team Leadership", "Business Communication", "Problem Solving", "Grant Writing"] },
-        { name: "Certifications",       items: ["Bloomberg Market Concepts (BMC)", "Standard First Aid CPR-C/AED", "CrossFit Level 1"] },
+        { name: "Certifications",       items: ["Bloomberg Market Concepts (BMC)", "Claude 101 (Anthropic)", "Standard First Aid CPR-C/AED", "CrossFit Level 1"] },
         { name: "Languages",            items: ["French", "English"] }
       ]
     },
