@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ludovic Lachance &lt;GO&gt; | Portfolio</title>
+  <meta name="description" content="Ludovic Lachance's portfolio: about, pitches, case competitions, entrepreneurship, experience, extracurriculars, skills and socials.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- =============================================================
+     BOOT SCREEN
+     ============================================================= -->
+<section class="screen boot" id="screen-boot" aria-label="Start screen">
+  <div class="boot-inner">
+    <div class="boot-logo"><span class="boot-name" id="boot-name">LUDOVIC LACHANCE</span> <span class="boot-go">&lt;GO&gt;</span></div>
+    <div class="boot-stage">
+      <div class="boot-banker banker-art walking" id="boot-banker"></div>
+    </div>
+    <pre class="boot-log" id="boot-log" aria-live="polite"></pre>
+    <div class="boot-actions">
+      <a href="#map" class="t-btn t-btn-amber t-btn-lg" id="boot-start">PRESS ENTER TO START<span class="caret" aria-hidden="true"></span></a>
+      <p class="boot-hint">Walk with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrow keys · hold <kbd>SHIFT</kbd> to run · <kbd>SPACE</kbd> to jump · <kbd>ENTER</kbd> near a sign to open it</p>
+      <a href="#classic" class="t-link">Prefer a plain page? Open the classic view</a>
+      <a href="?map=2d#map" class="t-link" id="boot-2d">Or explore the original 2D map</a>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     TERMINAL MAP
+     ============================================================= -->
+<section class="screen term" id="screen-map" aria-label="Portfolio map">
+  <header class="term-top">
+    <div class="term-brand"><span class="brand-block" id="brand-name">LUDOVIC LACHANCE</span><span class="brand-go">&lt;GO&gt;</span></div>
+    <div class="term-spacer"></div>
+    <div class="term-meta">
+      <span class="meta-item">VIEWED <b id="visited-count">0/8</b></span>
+      <span class="meta-item clock" id="clock">--:--:--</span>
+    </div>
+  </header>
+
+  <div class="tape" aria-hidden="true"><div class="tape-track" id="tape-track"></div></div>
+
+  <main class="map" id="map" tabindex="-1" aria-label="Map. Use W A S D or the arrow keys to walk, Enter to open a section, 1 to 8 to travel.">
+    <div class="world" id="world">
+      <svg class="world-art" id="world-art" width="1600" height="1600" viewBox="0 0 1600 1600" aria-hidden="true"></svg>
+      <div class="hub" id="hub" aria-hidden="true"><span>HQ</span><small>START</small></div>
+      <div id="nodes"></div>
+      <div class="banker" id="banker">
+        <span class="banker-tag" id="banker-tag">LUDOVIC</span>
+        <div class="banker-flip banker-art" id="banker-art"></div>
+      </div>
+    </div>
+
+    <button type="button" class="prompt" id="prompt" hidden></button>
+
+    <div class="dpad" id="dpad" aria-hidden="true">
+      <button type="button" data-dir="up" tabindex="-1">▲</button>
+      <button type="button" data-dir="left" tabindex="-1">◀</button>
+      <button type="button" data-dir="right" tabindex="-1">▶</button>
+      <button type="button" data-dir="down" tabindex="-1">▼</button>
+      <button type="button" data-dir="jump" class="only-3d" tabindex="-1">JUMP</button>
+    </div>
+  </main>
+
+  <footer class="term-status">
+    <span><kbd>WASD</kbd><kbd>↑↓←→</kbd> MOVE</span>
+    <span class="only-3d"><kbd>SHIFT</kbd> RUN</span>
+    <span class="only-3d"><kbd>SPACE</kbd> JUMP</span>
+    <span><kbd>ENTER</kbd> OPEN</span>
+    <span><kbd>1</kbd>–<kbd id="travel-max">8</kbd> TRAVEL</span>
+    <span class="hide-sm"><kbd>ESC</kbd> CLOSE</span>
+    <button type="button" class="status-btn" id="tour-btn"><kbd>T</kbd> GUIDED ROUTE</button>
+    <a href="?map=2d#map" class="status-btn" data-map-switch><kbd>M</kbd> 2D MAP</a>
+    <a href="#classic" class="status-btn hide-sm"><kbd>C</kbd> CLASSIC VIEW</a>
+  </footer>
+
+  <!-- section window -->
+  <div class="panel-backdrop" id="panel" hidden>
+    <section class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+      <header class="panel-head">
+        <span class="panel-fkey" id="panel-fkey">F1</span>
+        <h2 id="panel-title">ABOUT ME</h2>
+        <span class="panel-go">&lt;GO&gt;</span>
+        <button type="button" class="panel-close" id="panel-close" aria-label="Close section">ESC ✕</button>
+      </header>
+      <div class="panel-body" id="panel-body"></div>
+      <footer class="panel-foot">
+        <button type="button" class="t-btn" id="panel-prev">◀ PREV</button>
+        <button type="button" class="t-btn t-btn-amber" id="panel-next">NEXT ▶</button>
+      </footer>
+    </section>
+  </div>
+</section>
+
+<!-- =============================================================
+     CLASSIC VIEW (one plain page)
+     ============================================================= -->
+<section class="screen classic" id="screen-classic" aria-label="Classic view">
+  <div class="classic-inner">
+    <div class="classic-top">
+      <a href="#map" class="t-btn">◀ BACK TO THE MAP</a>
+    </div>
+    <div id="classic-body"></div>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script src="lib/three.min.js"></script>
+<script src="map3d.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Put your resume and stock overview PDFs in this folder.
+
+Then point to them in data.js, for example:
+  resumePdf: "files/resume.pdf"
+  pdf: "files/company-1-overview.pdf"
