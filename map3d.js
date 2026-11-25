@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var AMBER = 0xffa028, AMBER_DIM = 0x6e4510;
+  var AMBER = 0xf2b84b, AMBER_DIM = 0x8a6a2c;   // warm gold accents
   var FONT = '"JetBrains Mono", Consolas, monospace';
 
   function supported() {
@@ -32,19 +32,37 @@
     container.appendChild(renderer.domElement);
 
     var scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.Fog(0x000000, 40, 95);
+    // soft golden-hour sky, with haze that fades the far edges into it
+    var sky = document.createElement("canvas"); sky.width = 4; sky.height = 256;
+    var sg = sky.getContext("2d"), grad = sg.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, "#6fa3cf"); grad.addColorStop(0.55, "#b9d6e3"); grad.addColorStop(1, "#f1dfb9");
+    sg.fillStyle = grad; sg.fillRect(0, 0, 4, 256);
+    scene.background = new THREE.CanvasTexture(sky);
+    scene.fog = new THREE.Fog(0xb9ccb8, 48, 110);
     var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
 
-    scene.add(new THREE.HemisphereLight(0xfff1dc, 0x101010, 0.55));
-    var key = new THREE.DirectionalLight(0xffffff, 0.9);
+    scene.add(new THREE.HemisphereLight(0xdcecf5, 0x3d5a2a, 0.55));
+    var key = new THREE.DirectionalLight(0xffe9c4, 0.72);
     key.position.set(10, 22, 12);
     key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
     var sc = key.shadow.camera; sc.left = -26; sc.right = 26; sc.top = 26; sc.bottom = -26; sc.near = 1; sc.far = 70;
     scene.add(key);
 
-    var floor = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.95 }));
+    // grass lawn: a mottled green texture, repeated
+    var lawnC = document.createElement("canvas"); lawnC.width = lawnC.height = 256;
+    var lg = lawnC.getContext("2d");
+    lg.fillStyle = "#4f8a3c"; lg.fillRect(0, 0, 256, 256);
+    var greens = ["#467d35", "#5b9443", "#538c3e", "#3f7230", "#66a04b"];
+    for (var g = 0; g < 2600; g++) {
+      lg.fillStyle = greens[g % greens.length];
+      lg.globalAlpha = 0.35 + (g % 7) * 0.06;
+      lg.fillRect((g * 97.3) % 256, (g * 57.7 + (g % 13) * 11) % 256, 2 + (g % 3), 3 + (g % 4));
+    }
+    lg.globalAlpha = 1;
+    var lawnTex = new THREE.CanvasTexture(lawnC);
+    lawnTex.wrapS = lawnTex.wrapT = THREE.RepeatWrapping; lawnTex.repeat.set(40, 40); lawnTex.anisotropy = 8;
+    var floor = new THREE.Mesh(new THREE.PlaneGeometry(240, 240), new THREE.MeshStandardMaterial({ map: lawnTex, roughness: 1 }));
     floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
 
     function canvasTex(w, h, draw) {
@@ -56,11 +74,13 @@
     }
     function redraw(t) { var c = t.userData.canvas; var x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height); t.userData.draw(x, c.width, c.height); t.needsUpdate = true; }
 
-    // HQ
+    // HQ: a round stone plaza with a gold ring
+    var plaza = new THREE.Mesh(new THREE.CircleGeometry(2.9, 64), new THREE.MeshStandardMaterial({ color: 0xc9b58f, roughness: 0.95 }));
+    plaza.rotation.x = -Math.PI / 2; plaza.position.y = 0.025; plaza.receiveShadow = true; scene.add(plaza);
     var hq = new THREE.Mesh(new THREE.RingGeometry(2.3, 2.45, 64), new THREE.MeshBasicMaterial({ color: AMBER_DIM, side: THREE.DoubleSide }));
     hq.rotation.x = -Math.PI / 2; hq.position.y = 0.03; scene.add(hq);
     var hqTex = canvasTex(256, 128, function (x, w) {
-      x.fillStyle = "#6e4510"; x.textAlign = "center";
+      x.fillStyle = "#7a5a22"; x.textAlign = "center";
       x.font = "800 64px " + FONT; x.fillText("HQ", w / 2, 70);
       x.font = "700 20px " + FONT; x.fillText("START", w / 2, 108);
     });
@@ -68,8 +88,8 @@
     hqLabel.rotation.x = -Math.PI / 2; hqLabel.position.y = 0.04; scene.add(hqLabel);
 
     // roads
-    var roadMat = new THREE.MeshStandardMaterial({ color: 0x161616, roughness: 1 });
-    var dashMat = new THREE.MeshBasicMaterial({ color: AMBER, transparent: true, opacity: 0.55 });
+    var roadMat = new THREE.MeshStandardMaterial({ color: 0xbfae88, roughness: 1 });
+    var dashMat = new THREE.MeshBasicMaterial({ color: 0xf6ead0, transparent: true, opacity: 0.7 });
     var ring = new THREE.Mesh(new THREE.RingGeometry(ringR - 0.7, ringR + 0.7, 128), roadMat);
     ring.rotation.x = -Math.PI / 2; ring.position.y = 0.02; ring.receiveShadow = true; scene.add(ring);
     for (var d = 0; d < 64; d += 2) {
@@ -82,14 +102,14 @@
 
     function drawScreen(s, i) {
       return function (x, w, h) {
-        x.fillStyle = "#0c0c0c"; x.fillRect(0, 0, w, h);
-        x.fillStyle = "#141414"; x.fillRect(0, 0, w, 54);
-        x.fillStyle = "#ffa028"; x.fillRect(14, 12, 62, 30);
-        x.fillStyle = "#000"; x.font = "800 24px " + FONT; x.fillText(s.fkey || "F" + (i + 1), 24, 36);
-        x.fillStyle = "#ffa028"; x.font = "700 24px " + FONT; x.fillText(s.code || "", 92, 36);
+        x.fillStyle = "#0f1b17"; x.fillRect(0, 0, w, h);
+        x.fillStyle = "#172722"; x.fillRect(0, 0, w, 54);
+        x.fillStyle = "#f2b84b"; x.fillRect(14, 12, 62, 30);
+        x.fillStyle = "#13201b"; x.font = "800 24px " + FONT; x.fillText(s.fkey || "F" + (i + 1), 24, 36);
+        x.fillStyle = "#f2b84b"; x.font = "700 24px " + FONT; x.fillText(s.code || "", 92, 36);
         x.fillStyle = "#8f8f8f"; x.fillText("<GO>", w - 92, 36);
         // name, wrapped
-        x.fillStyle = "#e8e8e8"; x.font = "800 " + (s.label.length > 16 ? 32 : 40) + "px " + FONT;
+        x.fillStyle = "#eef2ec"; x.font = "800 " + (s.label.length > 16 ? 32 : 40) + "px " + FONT;
         var words = s.label.split(" "), line = "", y = 118;
         words.forEach(function (wd) {
           if ((line + wd).length > 15) { x.fillText(line.trim(), 22, y); y += 44; line = ""; }
@@ -98,13 +118,13 @@
         x.fillText(line.trim(), 22, y);
         x.fillStyle = "#9a9a9a"; x.font = "500 22px " + FONT; x.fillText(s.blurb || "", 22, y + 36);
         // sparkline
-        x.strokeStyle = i % 3 ? "#2bd47d" : "#ff5c5c"; x.lineWidth = 3; x.beginPath();
+        x.strokeStyle = i % 3 ? "#5fd38d" : "#ff7a6b"; x.lineWidth = 3; x.beginPath();
         var yy = 285; x.moveTo(20, yy);
         for (var p = 1; p <= 18; p++) { yy = Math.max(255, Math.min(312, yy + Math.sin(i * 7 + p * 1.7) * 18)); x.lineTo(20 + p * 26, yy); }
         x.stroke();
         // status
         var v = !!visited[s.id];
-        x.fillStyle = v ? "#2bd47d" : "#ffa028"; x.font = "700 20px " + FONT;
+        x.fillStyle = v ? "#5fd38d" : "#f2b84b"; x.font = "700 20px " + FONT;
         x.fillText(v ? "✓ VIEWED" : "● NEW", w - 140, h - 14);
       };
     }
@@ -127,11 +147,11 @@
       stop.position.set(stand.x, 0.04, stand.z); scene.add(stop);
 
       var kiosk = new THREE.Group();
-      var base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.1, 1.4), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6, metalness: 0.3 }));
+      var base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.1, 1.4), new THREE.MeshStandardMaterial({ color: 0x8d8576, roughness: 0.9 }));
       base.position.y = 0.55; base.castShadow = true; base.receiveShadow = true; kiosk.add(base);
-      var post = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.6, 0.4), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.4, roughness: 0.5 }));
+      var post = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.6, 0.4), new THREE.MeshStandardMaterial({ color: 0x2c3a35, metalness: 0.3, roughness: 0.6 }));
       post.position.set(0, 1.9, -0.2); post.castShadow = true; kiosk.add(post);
-      var frame = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.4, 0.18), new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.4, metalness: 0.5 }));
+      var frame = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.4, 0.18), new THREE.MeshStandardMaterial({ color: 0x1b2824, roughness: 0.5, metalness: 0.4 }));
       frame.position.set(0, 3.6, -0.1); frame.rotation.x = -0.12; frame.castShadow = true; kiosk.add(frame);
       var tex = canvasTex(512, 340, drawScreen(s, i));
       var screen = new THREE.Mesh(new THREE.PlaneGeometry(3.3, 2.15), new THREE.MeshBasicMaterial({ map: tex }));
@@ -144,6 +164,85 @@
       scene.add(kiosk);
       nodes.push({ i: i, ang: ang, pos: pos, stand: stand, kiosk: kiosk, edges: edges, glow: glow, tex: tex });
     });
+
+    // ---------- scenery: grass tufts, flowers, trees ----------
+    function onPath(x, z) {
+      var r = Math.sqrt(x * x + z * z);
+      if (r < 3.4) return true;                                  // HQ plaza
+      if (Math.abs(r - ringR) < 1.25) return true;               // ring road
+      for (var q = 0; q < nodes.length; q++) {
+        var n = nodes[q];
+        if (Math.hypot(x - n.pos.x, z - n.pos.z) < 2.4) return true;      // sign
+        var along = x * Math.cos(n.ang) + z * Math.sin(n.ang);
+        var side = -x * Math.sin(n.ang) + z * Math.cos(n.ang);
+        if (along > 0 && along < R && Math.abs(side) < 1.2) return true;  // spoke road
+      }
+      return false;
+    }
+    var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    var tmp = new THREE.Object3D(), col = new THREE.Color();
+
+    var TUFTS = 5200;
+    var tuft = new THREE.InstancedMesh(new THREE.ConeGeometry(0.07, 0.55, 3), new THREE.MeshStandardMaterial({ roughness: 1 }), TUFTS);
+    var tuftCols = [0x3f7a2e, 0x4c8a36, 0x5a9a40, 0x67a648, 0x44742b];
+    for (var t = 0, placed = 0; placed < TUFTS && t < TUFTS * 3; t++) {
+      var a = rnd() * Math.PI * 2, rr = Math.sqrt(rnd()) * 46, x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+      if (onPath(x, z)) continue;
+      var hgt = 0.6 + rnd() * 0.9;
+      tmp.position.set(x, 0.27 * hgt, z); tmp.rotation.set((rnd() - 0.5) * 0.5, rnd() * 6.3, (rnd() - 0.5) * 0.5); tmp.scale.set(1, hgt, 1);
+      tmp.updateMatrix(); tuft.setMatrixAt(placed, tmp.matrix);
+      tuft.setColorAt(placed, col.setHex(tuftCols[Math.floor(rnd() * tuftCols.length)])); placed++;
+    }
+    tuft.count = placed; scene.add(tuft);
+
+    var FLOWERS = 420;
+    var flower = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.11, 0), new THREE.MeshStandardMaterial({ roughness: 0.7 }), FLOWERS);
+    var petal = [0xffffff, 0xf7d64a, 0xf29bb4, 0xc9a7f0, 0xff9f6b];
+    for (var f = 0, fp = 0; fp < FLOWERS && f < FLOWERS * 4; f++) {
+      var fa = rnd() * Math.PI * 2, fr = 4 + Math.sqrt(rnd()) * 36, fx = Math.cos(fa) * fr, fz = Math.sin(fa) * fr;
+      if (onPath(fx, fz)) continue;
+      tmp.position.set(fx, 0.2, fz); tmp.rotation.set(0, 0, 0); tmp.scale.setScalar(0.8 + rnd() * 0.6); tmp.updateMatrix();
+      flower.setMatrixAt(fp, tmp.matrix); flower.setColorAt(fp, col.setHex(petal[Math.floor(rnd() * petal.length)])); fp++;
+    }
+    flower.count = fp; scene.add(flower);
+
+    var trunkMat = new THREE.MeshStandardMaterial({ color: 0x7a5636, roughness: 0.9 });
+    var leafMats = [0x2f6630, 0x3b7536, 0x4a843d, 0x285a32].map(function (c) { return new THREE.MeshStandardMaterial({ color: c, roughness: 0.85, flatShading: true }); });
+    function tree(x, z, sz) {
+      var tr = new THREE.Group();
+      var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16 * sz, 0.24 * sz, 1.4 * sz, 6), trunkMat);
+      trunk.position.y = 0.7 * sz; trunk.castShadow = true; tr.add(trunk);
+      var lm = leafMats[Math.floor(rnd() * leafMats.length)];
+      if (rnd() < 0.45) {   // pine
+        for (var c = 0; c < 3; c++) {
+          var cone = new THREE.Mesh(new THREE.ConeGeometry((1.3 - c * 0.3) * sz, 1.5 * sz, 7), lm);
+          cone.position.y = (1.6 + c * 0.75) * sz; cone.castShadow = true; tr.add(cone);
+        }
+      } else {              // round leafy tree
+        [[0, 2.1, 0, 1.15], [0.55, 1.75, 0.2, 0.8], [-0.5, 1.8, -0.25, 0.75]].forEach(function (b) {
+          var blob = new THREE.Mesh(new THREE.IcosahedronGeometry(b[3] * sz, 1), lm);
+          blob.position.set(b[0] * sz, b[1] * sz, b[2] * sz); blob.castShadow = true; tr.add(blob);
+        });
+      }
+      tr.position.set(x, 0, z); tr.rotation.y = rnd() * 6.3; scene.add(tr);
+    }
+    // a loose ring of trees between the signs, and a denser wood further out
+    nodes.forEach(function (n, q) {
+      var mid = n.ang + Math.PI / N;
+      tree(Math.cos(mid) * (R + 3.5), Math.sin(mid) * (R + 3.5), 0.95 + rnd() * 0.3);
+    });
+    for (var w = 0; w < 70; w++) {
+      var ta = rnd() * Math.PI * 2, trr = 23 + rnd() * 22;
+      tree(Math.cos(ta) * trr, Math.sin(ta) * trr, 0.9 + rnd() * 0.7);
+    }
+    // a few round bushes by the paths
+    var bushMat = new THREE.MeshStandardMaterial({ color: 0x3d7531, roughness: 0.9, flatShading: true });
+    for (var bsh = 0, bp = 0; bp < 26 && bsh < 200; bsh++) {
+      var ba = rnd() * Math.PI * 2, br = 5 + rnd() * 13, bx = Math.cos(ba) * br, bz = Math.sin(ba) * br;
+      if (onPath(bx, bz) || onPath(bx + 0.8, bz) || onPath(bx - 0.8, bz) || onPath(bx, bz + 0.8) || onPath(bx, bz - 0.8)) continue;
+      var bush = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55 + rnd() * 0.3, 1), bushMat);
+      bush.position.set(bx, 0.35, bz); bush.scale.y = 0.75; bush.castShadow = true; scene.add(bush); bp++;
+    }
 
     // ---------- the banker ----------
     function mat(c, r) { return new THREE.MeshStandardMaterial({ color: c, roughness: r == null ? 0.7 : r }); }
@@ -185,14 +284,14 @@
     }
     var armL = arm(-0.5, false), armR = arm(0.5, true);
     var tagTex = canvasTex(256, 64, function (x, w, h) {
-      x.fillStyle = "#ffa028"; x.fillRect(0, 0, w, h);
-      x.fillStyle = "#000"; x.font = "800 32px " + FONT; x.textAlign = "center";
+      x.fillStyle = "#f2b84b"; x.fillRect(0, 0, w, h);
+      x.fillStyle = "#13201b"; x.font = "800 32px " + FONT; x.textAlign = "center";
       x.fillText((opts.name || "").toUpperCase(), w / 2, 43);
     });
     var tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: tagTex, depthTest: false }));
     tag.scale.set(1.6, 0.4, 1); tag.position.y = 3.15; banker.add(tag);
     // soft shadow disc under the banker (stays on the ground while jumping)
-    var shadowDisc = new THREE.Mesh(new THREE.CircleGeometry(0.75, 32), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45 }));
+    var shadowDisc = new THREE.Mesh(new THREE.CircleGeometry(0.75, 32), new THREE.MeshBasicMaterial({ color: 0x1f3317, transparent: true, opacity: 0.35 }));
     shadowDisc.rotation.x = -Math.PI / 2; shadowDisc.position.y = 0.035; scene.add(shadowDisc);
     banker.scale.setScalar(1.35);
     banker.position.set(0, 0, 1.2);
@@ -364,7 +463,7 @@
     }
     S.shadowDisc.position.x = b.x; S.shadowDisc.position.z = b.z;
     var sScale = 1 - Math.min(0.6, b.y / 6); S.shadowDisc.scale.setScalar(sScale);
-    S.shadowDisc.material.opacity = 0.45 * sScale;
+    S.shadowDisc.material.opacity = 0.35 * sScale;
 
     // turn
     var diff = S.heading - S.banker.rotation.y; diff = Math.atan2(Math.sin(diff), Math.cos(diff));

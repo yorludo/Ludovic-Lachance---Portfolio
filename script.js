@@ -7,7 +7,7 @@
 
   var P = window.PORTFOLIO;
   if (!P) {
-    document.body.innerHTML = "<p style='color:#FFA028;padding:24px;font-family:monospace'>data.js did not load. Make sure data.js is in the same folder as index.html.</p>";
+    document.body.innerHTML = "<p style='color:#F2B84B;padding:24px;font-family:monospace'>data.js did not load. Make sure data.js is in the same folder as index.html.</p>";
     return;
   }
 
@@ -64,7 +64,7 @@
   var BANKER_SVG =
     '<svg viewBox="0 0 60 104" width="60" height="104" aria-hidden="true">' +
     '<ellipse cx="30" cy="100" rx="16" ry="3.5" fill="#000" opacity="0.6"/>' +
-    '<ellipse cx="30" cy="100" rx="22" ry="5" fill="#FFA028" opacity="0.12"/>' +
+    '<ellipse cx="30" cy="100" rx="22" ry="5" fill="#F2B84B" opacity="0.12"/>' +
     '<g class="bob">' +
       // back arm
       '<g class="arm arm-b"><rect x="27" y="35" width="7" height="24" rx="3.5" fill="#14243A"/><circle cx="30.5" cy="60" r="3.2" fill="#D6A985"/></g>' +
@@ -123,7 +123,7 @@
     other: '<path d="M10 14 A4 4 0 0 0 16 14 L19 11 A4 4 0 0 0 13 5 L12 6 M14 10 A4 4 0 0 0 8 10 L5 13 A4 4 0 0 0 11 19 L12 18"/>'
   };
   function icon(path, size, color) {
-    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || "#FFA028") +
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || "#F2B84B") +
       '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + "</svg>";
   }
 
@@ -173,6 +173,28 @@
   var currentScreen = null;
   var openId = null;
 
+  /* header + browser-tab title: the open section's name, otherwise "Ludovic Lachance - Portfolio" */
+  var SITE_TITLE = P.name + " - Portfolio";
+  var headerKey = undefined;
+  function setHeader(sec, idx) {
+    var key = sec ? sec.id : "";
+    document.title = sec ? sec.label + " | " + SITE_TITLE : SITE_TITLE;
+    if (key === headerKey) return;
+    headerKey = key;
+    var brand = $(".term-brand"), block = $("#brand-name"), go = $(".brand-go");
+    function paint() {
+      if (sec) {
+        block.innerHTML = '<span class="brand-fkey">' + esc(sec.fkey || "F" + (idx + 1)) + "</span>" + esc(sec.label.toUpperCase());
+        go.textContent = "<GO>"; go.hidden = false;
+      } else {
+        block.textContent = SITE_TITLE.toUpperCase();
+        go.textContent = ""; go.hidden = true;
+      }
+      brand.classList.remove("swap");
+    }
+    if (block.textContent) { brand.classList.add("swap"); setTimeout(paint, 180); } else paint();
+  }
+
   function showScreen(name) {
     if (currentScreen === name) return;
     Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
@@ -211,7 +233,7 @@
     if (booted) return;
     booted = true;
     var lines = [
-      "> CONNECTING TO " + P.name.toUpperCase() + " <GO> ...",
+      "> CONNECTING TO " + SITE_TITLE.toUpperCase() + " ...",
       "> LOADING PROFILE ............ OK",
       "> LOADING " + P.pitches.length + " PITCHES ............ OK",
       "> MAPPING " + N + " SECTIONS ........... OK",
@@ -246,11 +268,11 @@
     });
     s += roads.replace(/__C__/g, "#181818").replace(/__W__/g, "34").replace(/__D__/g, "");
     s += roads.replace(/__C__/g, "#232323").replace(/__W__/g, "26").replace(/__D__/g, "");
-    s += roads.replace(/__C__/g, "#FFA028").replace(/__W__/g, "1.6").replace(/__D__/g, ' stroke-dasharray="10 12" opacity="0.55"');
+    s += roads.replace(/__C__/g, "#F2B84B").replace(/__W__/g, "1.6").replace(/__D__/g, ' stroke-dasharray="10 12" opacity="0.55"');
     // little route markers where the banker stops
     nodes.forEach(function (n) {
-      s += '<circle cx="' + n.stand.x.toFixed(1) + '" cy="' + n.stand.y.toFixed(1) + '" r="9" fill="#0C0C0C" stroke="#FFA028" stroke-width="1.5"/>';
-      s += '<text x="' + n.stand.x.toFixed(1) + '" y="' + (n.stand.y + 3.5).toFixed(1) + '" fill="#FFA028" font-family="JetBrains Mono, monospace" font-size="10" font-weight="800" text-anchor="middle">' + (n.i + 1) + "</text>";
+      s += '<circle cx="' + n.stand.x.toFixed(1) + '" cy="' + n.stand.y.toFixed(1) + '" r="9" fill="#101C18" stroke="#F2B84B" stroke-width="1.5"/>';
+      s += '<text x="' + n.stand.x.toFixed(1) + '" y="' + (n.stand.y + 3.5).toFixed(1) + '" fill="#F2B84B" font-family="JetBrains Mono, monospace" font-size="10" font-weight="800" text-anchor="middle">' + (n.i + 1) + "</text>";
     });
     $("#world-art").innerHTML = s;
 
@@ -272,11 +294,9 @@
   }
 
   function buildChrome() {
-    var nm = P.name.toUpperCase();
-    $("#brand-name").textContent = nm;
-    $("#boot-name").textContent = nm;
+    setHeader(null);
+    $("#boot-name").textContent = P.name.toUpperCase() + " -\u2060\u00a0PORTFOLIO";   // wraps as "NAME" / "- PORTFOLIO" on phones
     $("#banker-tag").textContent = (P.shortName || P.name.split(" ")[0]).toUpperCase();
-    document.title = P.name + " <GO> | Portfolio";
 
     // ticker tape: built only from your own content
     var items = [];
@@ -563,6 +583,7 @@
     keys = {};
     markVisited(id);
     var s = n.sec;
+    setHeader(s, i);
     $("#panel-fkey").textContent = s.fkey || "F" + (i + 1);
     $("#panel-title").textContent = s.label;
     $("#panel-body").innerHTML = renderSection(s, pitchId, false);
@@ -579,6 +600,7 @@
   function closePanel() {
     if (panel.hidden) return;
     panel.hidden = true;
+    setHeader(null);
     if (use3D) window.Map3D.setPaused(false);
     openId = null;
     try { mapEl.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
@@ -758,7 +780,7 @@
      ===================================================================== */
   function renderClassic() {
     var h = '<div class="classic-hero">' + (P.photo ? '<img class="classic-photo" src="' + esc(P.photo) + '" alt="' + esc(P.name) + '">' : "") +
-      "<div><h1><span>" + esc(P.name.toUpperCase()) + "</span> &lt;GO&gt;</h1>" + (P.title ? '<p class="meta">' + esc(P.title) + "</p>" : "") + "</div></div>";
+      "<div><h1><span>" + esc(SITE_TITLE.toUpperCase()) + "</span></h1>" + (P.title ? '<p class="meta">' + esc(P.title) + "</p>" : "") + "</div></div>";
     P.sections.forEach(function (s, i) {
       h += '<section class="classic-sec"><h2>' + (i + 1) + " · " + esc(s.label.toUpperCase()) + "</h2>" + renderSection(s, null, true) + "</section>";
     });
