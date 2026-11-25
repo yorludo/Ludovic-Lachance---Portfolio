@@ -488,16 +488,29 @@
     render();
     rafId = requestAnimationFrame(step);
   }
-  function setActive(near) {
+  function setActive(near, text) {
     if (activeNode) { var oldEl = document.querySelector('.node[data-i="' + activeNode.i + '"]'); if (oldEl) oldEl.classList.remove("active"); }
     activeNode = near;
     var pr = $("#prompt");
     if (near) {
       var el = document.querySelector('.node[data-i="' + near.i + '"]');
       if (el) el.classList.add("active");
-      pr.innerHTML = "▶ " + esc(near.sec.label.toUpperCase()) + " &nbsp;—&nbsp; PRESS <kbd>ENTER</kbd>" + (use3D ? " OR CLICK THE SIGN" : "");
+      pr.innerHTML = text ? promptHtml(text) : "▶ " + esc(near.sec.label.toUpperCase()) + " &nbsp;—&nbsp; PRESS <kbd>ENTER</kbd>" + (use3D ? " OR CLICK THE SIGN" : "");
       pr.hidden = false;
-    } else pr.hidden = true;
+    } else if (text) { pr.innerHTML = promptHtml(text); pr.hidden = false; }
+    else pr.hidden = true;
+  }
+  // the 3D city sends plain text; key names become key caps
+  function promptHtml(t) {
+    return esc(t).replace(/\b(ENTER|ESC)\b/g, "<kbd>$1</kbd>").replace(/ — /g, " &nbsp;—&nbsp; ");
+  }
+  // Enter / click on the prompt: in the 3D city a door takes you inside; a billboard opens its details
+  function activate() {
+    if (use3D && window.Map3D.primary()) return;
+    if (!activeNode) return;
+    var h = use3D ? window.Map3D.activeHash() : null;
+    pendingEntry = use3D ? window.Map3D.activeEntry() : null;
+    location.hash = h || "s/" + activeNode.sec.id;
   }
 
   function startLoop() { if (!rafId) { lastTs = 0; rafId = requestAnimationFrame(step); } }
@@ -519,9 +532,10 @@
     }
     var dir = KEYMAP[e.code];
     if (dir) { if (!use3D) keys[dir] = true; e.preventDefault(); return; }   // the 3D map reads movement keys itself
-    if ((e.key === "Enter" || e.code === "KeyE" || (!use3D && e.key === " ")) && activeNode) {
+    if (e.key === "Enter" || e.code === "KeyE" || (!use3D && e.key === " " && activeNode)) {
+      if (!activeNode && !use3D) return;
       e.preventDefault();
-      location.hash = "s/" + activeNode.sec.id;
+      activate();
       return;
     }
     var num = parseInt(e.key, 10);
@@ -546,7 +560,7 @@
       y: cam.y + (e.clientY - rect.top - vh / 2) / zoom
     });
   });
-  $("#prompt").addEventListener("click", function () { if (activeNode) location.hash = "s/" + activeNode.sec.id; });
+  $("#prompt").addEventListener("click", function () { activate(); });
 
   // touch d-pad
   Array.prototype.forEach.call(document.querySelectorAll(".dpad button"), function (b) {
@@ -567,6 +581,7 @@
      SECTION WINDOW
      ===================================================================== */
   var panel = $("#panel");
+  var pendingEntry = null;
 
   function openSection(id, pitchId) {
     var i = sectionIndex(id);
@@ -588,6 +603,12 @@
     $("#panel-title").textContent = s.label;
     $("#panel-body").innerHTML = renderSection(s, pitchId, false);
     $("#panel-body").scrollTop = 0;
+    // opened from a billboard? scroll to that entry
+    if (pendingEntry != null && !pitchId) {
+      var boxes = $("#panel-body").querySelectorAll(".box");
+      if (boxes[pendingEntry]) $("#panel-body").scrollTop = boxes[pendingEntry].getBoundingClientRect().top - $("#panel-body").getBoundingClientRect().top - 12;
+    }
+    pendingEntry = null;
     var prev = nodes[(i - 1 + N) % N].sec, next = nodes[(i + 1) % N].sec;
     $("#panel-prev").textContent = "◀ " + prev.label.toUpperCase();
     $("#panel-next").textContent = "NEXT: " + next.label.toUpperCase() + " ▶";
@@ -805,8 +826,10 @@
     window.Map3D.init(mapEl, P.sections, {
       name: P.shortName || P.name.split(" ")[0],
       visited: visited,
-      onActive: function (i) { setActive(i === null ? null : nodes[i]); },
-      onOpen: function (i) { location.hash = "s/" + P.sections[i].id; }
+      portfolio: P,
+      onActive: function (i, text) { setActive(i === null ? null : nodes[i], text); },
+      onOpen: function (i, hash, entry) { pendingEntry = entry == null ? null : entry; location.hash = hash || "s/" + P.sections[i].id; },
+      onVisit: function (i) { markVisited(P.sections[i].id); }
     });
   }
   // switch between the 3D map and the original 2D map

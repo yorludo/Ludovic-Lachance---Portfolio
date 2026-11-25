@@ -1,12 +1,12 @@
-LUDO <GO> — portfolio website
-=============================
+LUDOVIC LACHANCE - PORTFOLIO — website
+======================================
 
 WHAT'S IN THIS FOLDER
 ---------------------
   index.html   The page itself
   style.css    The terminal look (colours, layout, the banker's walk)
   script.js    The game logic (routes, section windows, the 2D map)
-  map3d.js     The 3D map (the banker, roads, signs, camera)
+  map3d.js     The 3D city (statue, towers, lobbies and billboards, the banker)
   lib\         three.min.js, the free 3D library the map uses (don't edit)
   data.js      ALL YOUR CONTENT  <-- this is the file you edit
   files\       Put your PDFs here (resume + pitch PDFs)
@@ -32,24 +32,33 @@ After you edit a file, save it and refresh the browser (F5).
 
 HOW IT WORKS
 ------------
-The main site is the 3D map. The banker starts at HQ in the middle. The 8
-sections are signs in a circle around him, joined to HQ by roads and to each
-other by a ring road.
+The main site is a small 3D city. A marble statue of Ludovic stands on the
+plaza in the middle. Each of the 8 sections is a skyscraper around it, joined
+to the plaza by a road and to each other by a ring road. Walk into a tower's
+front door to go inside: its lobby lays the section out on billboards, one
+per entry (each case competition, each job, each pitch...).
 
+Outside
   W A S D  or  arrow keys   walk
   Shift (hold)              run
   Space                     jump
-  Enter (or E)              open the sign you're standing near
-  1 – 8                     walk the route to that section and open it
-  T                         guided route: walks to section 1, then use
+  Enter (or E)              go inside the tower you're standing at
+  1 – 8                     walk the route to that tower and go inside
+  T                         guided route: walks to tower 1, then use
                             "NEXT" in each window to walk to the next one
-  Esc                       close a section
   C                         classic view (everything on one plain page)
-  M                         switch between the 3D map and the original 2D map
+  M                         switch between the 3D city and the original 2D map
+  Click a tower to walk there and go in; click the ground to walk to that spot.
 
-You can also click any sign (the banker walks there first and opens it), or
-click anywhere on the ground to walk to that spot. On phones there's an
-on-screen arrow pad with a JUMP button.
+Inside a tower
+  Walk up to a billboard    the camera turns to face it so you can read it
+  Enter (or click it)       open the full details window at that entry
+  Esc                       close the window / leave the tower
+  You can also walk back out through the EXIT door.
+
+On phones: tap a tower or a billboard and the banker walks there; there's an
+on-screen arrow pad with a JUMP button. Towers between the camera and the
+banker turn see-through so he's never hidden.
 
 THE ORIGINAL 2D MAP
 The first version of the map is still there. Get to it with the "M 2D MAP"
