@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var AMBER = 0xffffff, AMBER_DIM = 0x6f8278;   // accents (white); the name tag keeps its gold
+  var AMBER = 0xffffff, AMBER_DIM = 0x6f8278;   // accents (white); the name tag is the blue highlight colour
   var FONT = '"JetBrains Mono", Consolas, monospace';
 
   function supported() {
@@ -283,7 +283,7 @@
     }
     var armL = arm(-0.5, false), armR = arm(0.5, true);
     var tagTex = canvasTex(256, 64, function (x, w, h) {
-      x.fillStyle = "#f2b84b"; x.fillRect(0, 0, w, h);
+      x.fillStyle = "#8fd3ff"; x.fillRect(0, 0, w, h);
       x.fillStyle = "#13201b"; x.font = "800 32px " + FONT; x.textAlign = "center";
       x.fillText((opts.name || "").toUpperCase(), w / 2, 43);
     });

@@ -11,8 +11,7 @@
   --amber: #FFFFFF;          /* accent colour (was orange, now white) */
   --amber-2: #DCE5E0;
   --amber-dim: #5E7268;
-  --hl: #8FD3FF;              /* highlighted text: key caps, ticker numbers, counters */
-  --gold: #F2B84B;            /* only used for the character's name tag */
+  --hl: #8FD3FF;              /* highlighted text: key caps, ticker numbers, counters, name tag */
   --text: #EEF2EC;
   --muted: #9DAAA2;
   --green: #5FD38D;
@@ -338,7 +337,7 @@ kbd {
   left: 50%;
   top: -6px;
   transform: translateX(-50%);
-  background: var(--gold);
+  background: var(--hl);
   color: var(--ink);
   font-size: 12px;
   font-weight: 800;
