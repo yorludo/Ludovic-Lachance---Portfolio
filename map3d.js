@@ -1,11 +1,11 @@
 /* =====================================================================
-   LUDOVIC LACHANCE <GO> — 3D map (uses lib/three.min.js)
+   LUDOVIC LACHANCE - PORTFOLIO — 3D map (uses lib/three.min.js)
    script.js decides whether to use this or the original 2D map.
    ===================================================================== */
 (function () {
   "use strict";
 
-  var AMBER = 0xf2b84b, AMBER_DIM = 0x8a6a2c;   // warm gold accents
+  var AMBER = 0xffffff, AMBER_DIM = 0x6f8278;   // accents (white); the name tag keeps its gold
   var FONT = '"JetBrains Mono", Consolas, monospace';
 
   function supported() {
@@ -80,7 +80,7 @@
     var hq = new THREE.Mesh(new THREE.RingGeometry(2.3, 2.45, 64), new THREE.MeshBasicMaterial({ color: AMBER_DIM, side: THREE.DoubleSide }));
     hq.rotation.x = -Math.PI / 2; hq.position.y = 0.03; scene.add(hq);
     var hqTex = canvasTex(256, 128, function (x, w) {
-      x.fillStyle = "#7a5a22"; x.textAlign = "center";
+      x.fillStyle = "#ffffff"; x.textAlign = "center";
       x.font = "800 64px " + FONT; x.fillText("HQ", w / 2, 70);
       x.font = "700 20px " + FONT; x.fillText("START", w / 2, 108);
     });
@@ -104,10 +104,9 @@
       return function (x, w, h) {
         x.fillStyle = "#0f1b17"; x.fillRect(0, 0, w, h);
         x.fillStyle = "#172722"; x.fillRect(0, 0, w, 54);
-        x.fillStyle = "#f2b84b"; x.fillRect(14, 12, 62, 30);
+        x.fillStyle = "#ffffff"; x.fillRect(14, 12, 62, 30);
         x.fillStyle = "#13201b"; x.font = "800 24px " + FONT; x.fillText(s.fkey || "F" + (i + 1), 24, 36);
-        x.fillStyle = "#f2b84b"; x.font = "700 24px " + FONT; x.fillText(s.code || "", 92, 36);
-        x.fillStyle = "#8f8f8f"; x.fillText("<GO>", w - 92, 36);
+        x.fillStyle = "#ffffff"; x.font = "700 24px " + FONT; x.fillText(s.code || "", 92, 36);
         // name, wrapped
         x.fillStyle = "#eef2ec"; x.font = "800 " + (s.label.length > 16 ? 32 : 40) + "px " + FONT;
         var words = s.label.split(" "), line = "", y = 118;
@@ -124,7 +123,7 @@
         x.stroke();
         // status
         var v = !!visited[s.id];
-        x.fillStyle = v ? "#5fd38d" : "#f2b84b"; x.font = "700 20px " + FONT;
+        x.fillStyle = v ? "#5fd38d" : "#ffffff"; x.font = "700 20px " + FONT;
         x.fillText(v ? "✓ VIEWED" : "● NEW", w - 140, h - 14);
       };
     }

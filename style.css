@@ -1,5 +1,5 @@
 /* =====================================================================
-   LUDO <GO> — terminal styles
+   LUDOVIC LACHANCE - PORTFOLIO — styles
    ===================================================================== */
 :root {
   --bg: #0B1411;
@@ -8,9 +8,11 @@
   --panel-2: #16241F;
   --line: #22342D;
   --line-2: #35493F;
-  --amber: #F2B84B;
-  --amber-2: #F7CB72;
-  --amber-dim: #8A6A2C;
+  --amber: #FFFFFF;          /* accent colour (was orange, now white) */
+  --amber-2: #DCE5E0;
+  --amber-dim: #5E7268;
+  --hl: #8FD3FF;              /* highlighted text: key caps, ticker numbers, counters */
+  --gold: #F2B84B;            /* only used for the character's name tag */
   --text: #EEF2EC;
   --muted: #9DAAA2;
   --green: #5FD38D;
@@ -37,7 +39,7 @@ kbd {
   border-bottom-width: 2px;
   border-radius: 3px;
   background: var(--panel-2);
-  color: var(--amber);
+  color: var(--hl);
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
@@ -131,7 +133,7 @@ kbd {
   text-align: left;
   white-space: pre-wrap;
 }
-.boot-log .amber { color: var(--amber); }
+.boot-log .amber { color: var(--hl); }
 .boot-actions { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .boot-hint { color: var(--muted); font-size: 12px; line-height: 1.8; }
 
@@ -170,11 +172,11 @@ kbd {
   font-size: 12px;
 }
 .term-brand { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15px; }
-.brand-block { background: var(--amber); color: var(--ink); padding: 1px 8px; }
+.brand-block { background: transparent; color: var(--text); padding: 1px 0; }
 .brand-go { color: var(--amber); }
 .term-spacer { flex: 1; }
-.term-meta { display: flex; gap: 16px; color: var(--muted); white-space: nowrap; }
-.term-meta b { color: var(--amber); }
+.term-meta { display: flex; gap: 16px; color: var(--text); white-space: nowrap; }
+.term-meta b { color: var(--hl); }
 .clock { color: var(--text); }
 
 .tape {
@@ -187,8 +189,8 @@ kbd {
   font-size: 12px;
 }
 .tape-track { display: inline-flex; white-space: nowrap; animation: tape 45s linear infinite; }
-.tape-track span { padding: 0 18px; color: var(--muted); }
-.tape-track b { color: var(--amber); font-weight: 700; }
+.tape-track span { padding: 0 18px; color: var(--text); }
+.tape-track b { color: var(--hl); font-weight: 700; }
 .tape-track .up { color: var(--green); }
 .tape-track .down { color: var(--red); }
 @keyframes tape { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -313,7 +315,7 @@ kbd {
 .node.visited .node-status { color: var(--green); }
 .node.active {
   border-color: var(--amber);
-  box-shadow: 0 0 0 1px var(--amber), 0 0 28px rgba(242, 184, 75, 0.35);
+  box-shadow: 0 0 0 1px var(--amber), 0 0 28px rgba(255, 255, 255, 0.35);
   transform: translate(-50%, -50%) scale(1.05);
 }
 .node.target { border-color: var(--amber-2); }
@@ -336,7 +338,7 @@ kbd {
   left: 50%;
   top: -6px;
   transform: translateX(-50%);
-  background: var(--amber);
+  background: var(--gold);
   color: var(--ink);
   font-size: 12px;
   font-weight: 800;
@@ -363,7 +365,7 @@ kbd {
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  box-shadow: 0 0 24px rgba(242, 184, 75, 0.25);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.25);
   z-index: 6;
 }
 .prompt:hover { background: var(--amber); color: var(--ink); }
@@ -424,7 +426,7 @@ kbd {
   flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--amber);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(242, 184, 75, 0.14);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 255, 255, 0.14);
   animation: panelIn 0.22s ease-out;
 }
 @keyframes panelIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
@@ -440,7 +442,7 @@ kbd {
 }
 .panel-fkey { background: var(--ink); color: var(--amber); padding: 1px 6px; font-size: 12px; }
 .panel-head h2 { font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; }
-.panel-go { flex: 1; font-size: 13px; }
+.panel-head h2 { flex: 1; }
 .panel-close {
   height: 100%;
   padding: 0 14px;
@@ -625,4 +627,4 @@ kbd {
 /* header that follows the open section */
 .brand-block, .brand-go { transition: opacity 0.18s ease; }
 .term-brand.swap .brand-block, .term-brand.swap .brand-go { opacity: 0; }
-.brand-fkey { background: var(--ink); color: var(--amber); padding: 0 6px; margin-right: 8px; font-size: 0.85em; }
+.brand-fkey { border: 1px solid var(--line-2); color: var(--text); padding: 0 6px; margin-right: 10px; font-size: 0.85em; }

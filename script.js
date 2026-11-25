@@ -1,5 +1,5 @@
 /* =====================================================================
-   LUDO <GO> — behaviour
+   LUDOVIC LACHANCE - PORTFOLIO — behaviour
    You normally don't need to edit this file: content lives in data.js.
    ===================================================================== */
 (function () {
@@ -7,7 +7,7 @@
 
   var P = window.PORTFOLIO;
   if (!P) {
-    document.body.innerHTML = "<p style='color:#F2B84B;padding:24px;font-family:monospace'>data.js did not load. Make sure data.js is in the same folder as index.html.</p>";
+    document.body.innerHTML = "<p style='color:#FFFFFF;padding:24px;font-family:monospace'>data.js did not load. Make sure data.js is in the same folder as index.html.</p>";
     return;
   }
 
@@ -64,7 +64,7 @@
   var BANKER_SVG =
     '<svg viewBox="0 0 60 104" width="60" height="104" aria-hidden="true">' +
     '<ellipse cx="30" cy="100" rx="16" ry="3.5" fill="#000" opacity="0.6"/>' +
-    '<ellipse cx="30" cy="100" rx="22" ry="5" fill="#F2B84B" opacity="0.12"/>' +
+    '<ellipse cx="30" cy="100" rx="22" ry="5" fill="#FFFFFF" opacity="0.12"/>' +
     '<g class="bob">' +
       // back arm
       '<g class="arm arm-b"><rect x="27" y="35" width="7" height="24" rx="3.5" fill="#14243A"/><circle cx="30.5" cy="60" r="3.2" fill="#D6A985"/></g>' +
@@ -123,7 +123,7 @@
     other: '<path d="M10 14 A4 4 0 0 0 16 14 L19 11 A4 4 0 0 0 13 5 L12 6 M14 10 A4 4 0 0 0 8 10 L5 13 A4 4 0 0 0 11 19 L12 18"/>'
   };
   function icon(path, size, color) {
-    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || "#F2B84B") +
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || "#FFFFFF") +
       '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + "</svg>";
   }
 
@@ -185,7 +185,7 @@
     function paint() {
       if (sec) {
         block.innerHTML = '<span class="brand-fkey">' + esc(sec.fkey || "F" + (idx + 1)) + "</span>" + esc(sec.label.toUpperCase());
-        go.textContent = "<GO>"; go.hidden = false;
+        go.textContent = ""; go.hidden = true;
       } else {
         block.textContent = SITE_TITLE.toUpperCase();
         go.textContent = ""; go.hidden = true;
@@ -268,11 +268,11 @@
     });
     s += roads.replace(/__C__/g, "#181818").replace(/__W__/g, "34").replace(/__D__/g, "");
     s += roads.replace(/__C__/g, "#232323").replace(/__W__/g, "26").replace(/__D__/g, "");
-    s += roads.replace(/__C__/g, "#F2B84B").replace(/__W__/g, "1.6").replace(/__D__/g, ' stroke-dasharray="10 12" opacity="0.55"');
+    s += roads.replace(/__C__/g, "#FFFFFF").replace(/__W__/g, "1.6").replace(/__D__/g, ' stroke-dasharray="10 12" opacity="0.55"');
     // little route markers where the banker stops
     nodes.forEach(function (n) {
-      s += '<circle cx="' + n.stand.x.toFixed(1) + '" cy="' + n.stand.y.toFixed(1) + '" r="9" fill="#101C18" stroke="#F2B84B" stroke-width="1.5"/>';
-      s += '<text x="' + n.stand.x.toFixed(1) + '" y="' + (n.stand.y + 3.5).toFixed(1) + '" fill="#F2B84B" font-family="JetBrains Mono, monospace" font-size="10" font-weight="800" text-anchor="middle">' + (n.i + 1) + "</text>";
+      s += '<circle cx="' + n.stand.x.toFixed(1) + '" cy="' + n.stand.y.toFixed(1) + '" r="9" fill="#101C18" stroke="#FFFFFF" stroke-width="1.5"/>';
+      s += '<text x="' + n.stand.x.toFixed(1) + '" y="' + (n.stand.y + 3.5).toFixed(1) + '" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-size="10" font-weight="800" text-anchor="middle">' + (n.i + 1) + "</text>";
     });
     $("#world-art").innerHTML = s;
 
@@ -281,7 +281,7 @@
     nodes.forEach(function (n) {
       var s2 = n.sec;
       html += '<button type="button" class="node" data-i="' + n.i + '" style="left:' + n.pos.x.toFixed(0) + "px;top:" + n.pos.y.toFixed(0) + 'px" aria-label="' + esc((n.i + 1) + ". " + s2.label) + '">' +
-        '<span class="node-head"><span class="node-fkey">' + esc(s2.fkey || "F" + (n.i + 1)) + '</span><span class="node-code">' + esc(s2.code || "") + '</span><span class="node-go">&lt;GO&gt;</span></span>' +
+        '<span class="node-head"><span class="node-fkey">' + esc(s2.fkey || "F" + (n.i + 1)) + '</span><span class="node-code">' + esc(s2.code || "") + '</span></span>' +
         '<span class="node-body"><span class="node-icon">' + icon(ICONS[s2.id] || ICONS.resume, 22) + "</span>" +
         '<span class="node-text"><span class="node-label">' + esc(s2.label) + '</span><span class="node-blurb">' + esc(s2.blurb || "") + "</span></span></span>" +
         '<svg class="node-spark" viewBox="0 0 196 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + sparkPath(196, 26, 18) + '" fill="none" stroke="' + (rnd() > 0.4 ? "#2BD47D" : "#FF5C5C") + '" stroke-width="1.2" opacity="0.7"/></svg>' +
@@ -300,7 +300,7 @@
 
     // ticker tape: built only from your own content
     var items = [];
-    P.sections.forEach(function (s, i) { items.push("<span><b>" + (i + 1) + "</b> " + esc(s.label.toUpperCase()) + " &lt;GO&gt;</span>"); });
+    P.sections.forEach(function (s, i) { items.push("<span><b>" + (i + 1) + "</b> " + esc(s.label.toUpperCase()) + "</span>"); });
     P.pitches.forEach(function (p) {
       var cc = callClass(p.call);
       items.push("<span><b>" + esc(p.ticker) + "</b> " + esc(p.company) + ' <span class="' + (cc === "call-buy" ? "up" : cc === "call-sell" ? "down" : "") + '">' + esc(p.call) + "</span></span>");
