@@ -44,7 +44,8 @@ window.PORTFOLIO = {
             "Real estate case competition hosted by the University of Ottawa Real Estate Club (uOREC) in partnership with TCU Development, an Ottawa-based real estate development company",
             "Led a full investment property analysis with my team, including financial modelling, and pitched our recommendation to the judges, taking 1st place and a $1,000 prize"
           ],
-          skills: ["Financial Modelling", "Real Estate Analysis", "Valuation", "Pitching"], link: "" },
+          skills: ["Financial Modelling", "Real Estate Analysis", "Valuation", "Pitching"], link: "",
+          image: "files/uorec-2026.jpg", imageAlt: "Ludovic and his team holding the TCU x uOREC first-place cheque with the organizers" },
         { title: "The CPA Way Case Competition 2026", org: "", date: "October 2026", result: "3rd Place · $500", text: "",
           bullets: [
             "CPA Ontario case competition for first- and second-year undergraduates, where teams applied The CPA Way framework to assess the ethics of a real-life business situation",
