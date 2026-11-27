@@ -1,5 +1,5 @@
 /* =====================================================================
-   LUDOVIC LACHANCE - PORTFOLIO — 3D city (uses lib/three.min.js)
+   LUDOVIC LACHANCE - PORTFOLIO - 3D city (uses lib/three.min.js)
    A statue of Ludovic stands in the middle. Each section is a skyscraper
    you can walk into; inside, its content is laid out on billboards.
    script.js decides whether to use this or the original 2D map.
@@ -8,8 +8,8 @@
   "use strict";
 
   var WHITE = 0xffffff, DIM = 0x6f8278, BLUE = 0x8fd3ff;
-  var FONT = '"JetBrains Mono", Consolas, monospace';
-  var C = { bg: "#0f1b17", head: "#172722", text: "#eef2ec", muted: "#9daaa2", blue: "#8fd3ff", line: "#35493f", ink: "#13201b", green: "#5fd38d" };
+  var FONT = '"DM Sans", "Segoe UI", system-ui, sans-serif';
+  var C = { bg: "#0f1b17", head: "#172722", text: "#ffffff", muted: "#ffffff", blue: "#8fd3ff", line: "#35493f", ink: "#13201b", green: "#5fd38d" };
 
   function supported() {
     if (!window.THREE) return false;
@@ -66,40 +66,88 @@
   /* ---------------------------------------------------------------
      a person (the banker, and his statue) built from boxes
      --------------------------------------------------------------- */
-  function buildPerson(M) {
+  function buildPerson(M, opt) {
+    opt = opt || {};
     var root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+    function part(geo, m, shadow) { var o = new THREE.Mesh(geo, m); o.castShadow = shadow !== false; return o; }
+    function cap(r, len, m) { return part(new THREE.CapsuleGeometry(r, len, 4, 10), m); }
+    function ball(r, m, sx, sy, sz) { var o = part(new THREE.SphereGeometry(r, 18, 14), m); if (sx) o.scale.set(sx, sy, sz); return o; }
+
+    // legs: hip → thigh, knee → shin and shoe
     function leg(xx) {
-      var hip = new THREE.Group(); hip.position.set(xx, 1.0, 0);
-      var l = box(0.26, 0.95, 0.28, M.pants); l.position.y = -0.47; hip.add(l);
-      var sh = box(0.3, 0.14, 0.44, M.shoe); sh.position.set(0, -0.98, 0.08); hip.add(sh);
-      body.add(hip); return hip;
+      var hip = new THREE.Group(); hip.position.set(xx, 1.02, 0);
+      var thigh = cap(0.115, 0.34, M.pants); thigh.position.y = -0.25; hip.add(thigh);
+      var knee = new THREE.Group(); knee.position.y = -0.5; hip.add(knee);
+      var shin = cap(0.1, 0.33, M.pants); shin.position.y = -0.22; knee.add(shin);
+      var shoe = cap(0.075, 0.2, M.shoe); shoe.rotation.x = Math.PI / 2; shoe.scale.set(1.25, 1, 0.9); shoe.position.set(0, -0.46, 0.07); knee.add(shoe);
+      body.add(hip); return { hip: hip, knee: knee };
     }
-    var legL = leg(-0.17), legR = leg(0.17);
-    var torso = box(0.78, 0.95, 0.44, M.suit); torso.position.y = 1.47; body.add(torso);
-    var hem = box(0.8, 0.12, 0.46, M.suitD); hem.position.y = 1.02; body.add(hem);
-    var shirt = box(0.24, 0.42, 0.02, M.shirt); shirt.position.set(0, 1.72, 0.225); body.add(shirt);
-    var tie = box(0.09, 0.42, 0.02, M.tie); tie.position.set(0, 1.68, 0.238); body.add(tie);
-    var knot = box(0.12, 0.08, 0.03, M.tie); knot.position.set(0, 1.9, 0.236); body.add(knot);
-    var pocket = box(0.13, 0.05, 0.02, M.shirt); pocket.position.set(0.24, 1.66, 0.226); body.add(pocket);
-    var neck = box(0.2, 0.14, 0.2, M.skin); neck.position.y = 2.0; body.add(neck);
-    var head = box(0.46, 0.5, 0.44, M.skin); head.position.y = 2.3; body.add(head);
-    var hair = box(0.5, 0.16, 0.48, M.hair); hair.position.set(0, 2.58, -0.02); body.add(hair);
-    var hairBack = box(0.5, 0.3, 0.12, M.hair); hairBack.position.set(0, 2.42, -0.2); body.add(hairBack);
-    var eyeL = box(0.06, 0.06, 0.02, M.eye); eyeL.position.set(-0.11, 2.33, 0.225); body.add(eyeL);
-    var eyeR = eyeL.clone(); eyeR.position.x = 0.11; body.add(eyeR);
+    var L = leg(-0.13), Rg = leg(0.13);
+    var pelvis = ball(0.24, M.pants, 1.12, 0.5, 0.78); pelvis.position.y = 1.03; body.add(pelvis);
+    // jacket: a tapered body, rounded shoulders, a little hem
+    var torso = part(new THREE.CylinderGeometry(0.29, 0.245, 0.74, 20), M.suit); torso.scale.z = 0.66; torso.position.y = 1.42; body.add(torso);
+    var shoulders = ball(0.3, M.suit, 1.04, 0.42, 0.68); shoulders.position.y = 1.76; body.add(shoulders);
+    var shirt = part(new THREE.CylinderGeometry(0.0, 0.11, 0.34, 3), M.shirt, false); shirt.rotation.set(Math.PI, Math.PI / 6, 0); shirt.scale.z = 0.12; shirt.position.set(0, 1.66, 0.19); body.add(shirt);
+    if (M.tie) {
+      var tie = part(new THREE.BoxGeometry(0.055, 0.3, 0.015), M.tie, false); tie.position.set(0, 1.6, 0.205); body.add(tie);
+      var knot = ball(0.03, M.tie); knot.position.set(0, 1.79, 0.2); body.add(knot);
+    }
+    [-1, 1].forEach(function (sd) {   // lapels
+      var lap = part(new THREE.BoxGeometry(0.07, 0.3, 0.015), M.suitD, false); lap.position.set(sd * 0.085, 1.66, 0.198); lap.rotation.z = sd * 0.42; body.add(lap);
+    });
+    var neck = part(new THREE.CylinderGeometry(0.07, 0.08, 0.16, 12), M.skin); neck.position.y = 1.9; body.add(neck);
+
+    // head and face
+    var head = new THREE.Group(); head.position.y = 2.14; body.add(head);
+    head.add(ball(0.21, M.skin, 0.94, 1.08, 1.0));
+    var hairTop = ball(0.225, M.hair, 0.98, 0.72, 1.04); hairTop.position.set(0, 0.095, -0.025); head.add(hairTop);
+    var hairBack = ball(0.2, M.hair, 1.0, 0.9, 0.6); hairBack.position.set(0, 0.02, -0.1); head.add(hairBack);
+    var fringe = ball(0.12, M.hair, 1.55, 0.45, 0.75); fringe.position.set(0.04, 0.165, 0.13); fringe.rotation.z = -0.2; head.add(fringe);
+    [-1, 1].forEach(function (sd) {
+      var ear = ball(0.042, M.skin, 0.55, 1, 0.8); ear.position.set(sd * 0.198, 0, -0.01); head.add(ear);
+      var white = ball(0.033, M.eyeW || M.skin, 1, 0.85, 0.45); white.position.set(sd * 0.072, 0.025, 0.188); head.add(white);
+      var pupil = ball(0.019, M.eye, 1, 1, 0.5); pupil.position.set(sd * 0.072, 0.023, 0.202); head.add(pupil);
+      var brow = part(new THREE.BoxGeometry(0.075, 0.016, 0.02), M.hair, false); brow.position.set(sd * 0.074, 0.085, 0.193); brow.rotation.z = -sd * 0.08; head.add(brow);
+    });
+    var nose = ball(0.032, M.skin, 0.8, 1, 1.25); nose.position.set(0, -0.02, 0.205); head.add(nose);
+    var mouth = part(new THREE.TorusGeometry(0.04, 0.009, 6, 12, Math.PI), M.mouth || M.eye, false); mouth.rotation.z = Math.PI; mouth.position.set(0, -0.085, 0.192); head.add(mouth);
+
+    // arms: shoulder → upper arm, elbow → forearm and hand
     function arm(xx, withCase) {
-      var sh = new THREE.Group(); sh.position.set(xx, 1.86, 0);
-      var a = box(0.2, 0.82, 0.24, M.suit); a.position.y = -0.4; sh.add(a);
-      var cuff = box(0.21, 0.06, 0.25, M.shirt); cuff.position.y = -0.82; sh.add(cuff);
-      var hand = box(0.17, 0.17, 0.18, M.skin); hand.position.y = -0.92; sh.add(hand);
-      if (withCase) {
-        var bc = box(0.16, 0.42, 0.62, M.bcase); bc.position.set(0, -1.22, 0); sh.add(bc);
-        var clasp = box(0.17, 0.05, 0.08, M.clasp); clasp.position.set(0, -1.06, 0); sh.add(clasp);
+      var sh = new THREE.Group(); sh.position.set(xx, 1.76, 0);
+      var upper = cap(0.082, 0.3, M.suit); upper.position.y = -0.2; sh.add(upper);
+      var elbow = new THREE.Group(); elbow.position.y = -0.42; sh.add(elbow);
+      var fore = cap(0.072, 0.27, M.suit); fore.position.y = -0.17; elbow.add(fore);
+      var cuff = part(new THREE.CylinderGeometry(0.075, 0.075, 0.04, 12), M.shirt, false); cuff.position.y = -0.35; elbow.add(cuff);
+      var hand = ball(0.07, M.skin, 0.85, 1.1, 0.8); hand.position.y = -0.42; elbow.add(hand);
+      if (withCase && M.bcase) {
+        var bc = part(new THREE.BoxGeometry(0.12, 0.34, 0.5), M.bcase); bc.position.set(0, -0.66, 0); elbow.add(bc);
+        var handle = part(new THREE.TorusGeometry(0.06, 0.014, 6, 12, Math.PI), M.bcase); handle.position.set(0, -0.48, 0); handle.rotation.y = Math.PI / 2; elbow.add(handle);
+        var clasp = part(new THREE.BoxGeometry(0.13, 0.04, 0.07), M.clasp, false); clasp.position.set(0, -0.53, 0); elbow.add(clasp);
       }
-      body.add(sh); return sh;
+      body.add(sh); return { sh: sh, elbow: elbow };
     }
-    var armL = arm(-0.5, false), armR = arm(0.5, true);
-    return { root: root, body: body, legL: legL, legR: legR, armL: armL, armR: armR };
+    var aL = arm(-0.37, false), aR = arm(0.37, opt.briefcase !== false);
+    return { root: root, body: body, head: head, legL: L.hip, legR: Rg.hip, kneeL: L.knee, kneeR: Rg.knee, armL: aL.sh, armR: aR.sh, elbowL: aL.elbow, elbowR: aR.elbow };
+  }
+
+  // walking / idle / jumping pose, shared by the banker and the people in the city
+  function animatePerson(Pp, phase, moving, run, jumping, dt, t) {
+    var k = Math.min(1, dt * 14);
+    var amp = run ? 0.9 : 0.55, swing = moving ? Math.sin(phase) * amp : 0;
+    var lL = swing, lR = -swing, aL = -swing * 0.8, aR = swing * 0.5;
+    var kL = moving ? Math.max(0, Math.sin(phase + 1.2)) * (run ? 1.3 : 0.8) : 0.04, kR = moving ? Math.max(0, Math.sin(phase + 1.2 + Math.PI)) * (run ? 1.3 : 0.8) : 0.04;
+    var eL = moving ? -0.35 - (run ? 0.6 : 0) : -0.12, eR = moving ? -0.25 - (run ? 0.5 : 0) : -0.1;
+    if (jumping) { lL = -0.7; lR = 0.25; kL = 1.1; kR = 0.6; aL = -2.5; aR = -0.7; eL = -0.3; eR = -0.6; }
+    Pp.legL.rotation.x += (lL - Pp.legL.rotation.x) * k; Pp.legR.rotation.x += (lR - Pp.legR.rotation.x) * k;
+    Pp.kneeL.rotation.x += (kL - Pp.kneeL.rotation.x) * k; Pp.kneeR.rotation.x += (kR - Pp.kneeR.rotation.x) * k;
+    Pp.armL.rotation.x += (aL - Pp.armL.rotation.x) * k; Pp.armR.rotation.x += (aR - Pp.armR.rotation.x) * k;
+    Pp.elbowL.rotation.x += (eL - Pp.elbowL.rotation.x) * k; Pp.elbowR.rotation.x += (eR - Pp.elbowR.rotation.x) * k;
+    Pp.armL.rotation.z = 0.06; Pp.armR.rotation.z = -0.06;
+    Pp.body.position.y = (moving && !jumping) ? Math.abs(Math.sin(phase)) * (run ? 0.12 : 0.06) : Math.sin(t * 2) * 0.008;
+    Pp.body.rotation.x = run && moving && !jumping ? 0.14 : 0;
+    Pp.body.rotation.y = moving ? Math.sin(phase) * 0.06 : 0;
+    Pp.head.rotation.y = moving ? -Math.sin(phase) * 0.05 : Math.sin(t * 0.7) * 0.12;
   }
 
   /* ---------------------------------------------------------------
@@ -116,32 +164,32 @@
     var B = [];
     if (sec.type === "about") {
       var halves = splitHalf(P.about || "");
-      B.push({ kind: "about", kicker: "WHO I AM", title: P.name, sub: "Finance & Accounting Co-op · University of Ottawa", body: halves[0], photo: P.photo });
-      B.push({ kind: "text", kicker: "BEYOND THE OFFICE", title: "Outside of school & work", body: halves[1] });
+      B.push({ kind: "about", kicker: "Who I am", title: P.name, sub: "Finance & Accounting Co-op · University of Ottawa", body: halves[0], photo: P.photo });
+      B.push({ kind: "text", kicker: "Beyond the office", title: "Outside of school & work", body: halves[1] });
       var cases = 0, ventures = 0;
       P.sections.forEach(function (s) { if (s.id === "cases") cases = (s.items || []).length; if (s.id === "ventures") ventures = (s.items || []).length; });
-      B.push({ kind: "stats", kicker: "FOCUS", title: "Where I'm headed", stats: [[P.pitches.length, "Pitches"], [cases, "Case comps"], [ventures, "Ventures"]], tags: P.badges || [] });
-      B.push({ kind: "text", kicker: "RESUME & CONTACT", title: "Let's connect", body: "My full resume (PDF) and email are one click away. Press Enter to open the About Me window with the resume and contact buttons.", tags: ["Resume (PDF)", "Email"] });
+      B.push({ kind: "stats", kicker: "Focus", title: "Where I'm headed", stats: [[P.pitches.length, "Pitches"], [cases, "Case comps"], [ventures, "Ventures"]], tags: P.badges || [] });
+      B.push({ kind: "text", kicker: "Resume & contact", title: "Let's connect", body: "My full resume (PDF) and email are one click away. Press Enter to open the About Me window with the resume and contact buttons.", tags: ["Resume (PDF)", "Email"] });
     } else if (sec.type === "pitches") {
       P.pitches.forEach(function (p, k) {
-        B.push({ kind: "pitch", kicker: "PITCH " + (k + 1) + "/" + P.pitches.length, title: p.ticker + " · " + p.company,
-          sub: [p.exchange, p.sector, p.date].filter(Boolean).join(" · "), badge: (p.call || "").toUpperCase() + " · TARGET " + (p.target || ""),
-          metrics: (p.metrics || []).slice(0, 8), foot: [p.role, p.team].filter(Boolean).join(" · "), hash: "s/pitches/" + p.id });
+        B.push({ kind: "pitch", kicker: "Pitch " + (k + 1) + "/" + P.pitches.length, title: p.ticker + " · " + p.company,
+          sub: [p.exchange, p.sector, p.date].filter(Boolean).join(" · "), badge: (p.call || "") + " · Target " + (p.target || ""),
+          metrics: (p.metrics || []).slice(0, 8), foot: [p.role, p.team].filter(Boolean).join(" · "), hash: "s/pitches/" + p.id, when: p.date || "" });
       });
     } else if (sec.type === "entries") {
       (sec.items || []).forEach(function (it, k) {
         B.push({ kind: "entry", kicker: (k + 1) + "/" + sec.items.length, title: it.title, sub: [it.org, it.date].filter(Boolean).join(" · "),
           badge: it.result || "", bullets: it.bullets && it.bullets.length ? it.bullets : (it.text ? it.text.split(/\n\n+/) : []),
-          tags: it.skills || [], image: it.image || "", entry: k });
+          tags: it.skills || [], image: it.image || "", entry: k, when: it.date || "" });
       });
     } else if (sec.type === "skills") {
       (sec.groups || []).forEach(function (g, k) {
-        B.push({ kind: "chips", kicker: "SKILLS " + (k + 1) + "/" + sec.groups.length, title: g.name, tags: g.items || [], entry: k });
+        B.push({ kind: "chips", kicker: "Skills " + (k + 1) + "/" + sec.groups.length, title: g.name, tags: g.items || [], entry: k });
       });
     } else if (sec.type === "socials") {
       (sec.links || []).forEach(function (l, k) {
-        var what = { email: "Write to me — I usually reply within a day.", linkedin: "Connect with me and see my latest experience.", github: "Browse my projects and the code behind this site." }[l.kind] || "";
-        B.push({ kind: "text", kicker: "REACH OUT " + (k + 1) + "/" + sec.links.length, title: l.label, body: l.url, big: true, note: what, foot2: sec.intro, entry: k });
+        var what = { email: "Send me an email - questions, opportunities or just to say hi.", linkedin: "Connect with me and see my latest experience.", github: "Browse my projects and the code behind this site." }[l.kind] || "";
+        B.push({ kind: "text", kicker: "Reach out " + (k + 1) + "/" + sec.links.length, title: l.label, body: l.url, big: true, note: what, foot2: sec.intro, entry: k });
       });
     }
     return B;
@@ -155,7 +203,7 @@
       // header: section key + kicker
       x.fillStyle = "#ffffff"; x.fillRect(22, 14, 64, 36);
       x.fillStyle = C.ink; x.font = "800 24px " + FONT; x.textAlign = "center"; x.fillText(sec.fkey || "", 54, 41); x.textAlign = "left";
-      x.fillStyle = "#ffffff"; x.font = "700 24px " + FONT; x.fillText(sec.label.toUpperCase(), 104, 41);
+      x.fillStyle = "#ffffff"; x.font = "700 24px " + FONT; x.fillText(sec.label, 104, 41);
       x.fillStyle = C.blue; x.textAlign = "right"; x.fillText(b.kicker || "", w - 24, 41); x.textAlign = "left";
 
       var L = 40, R = w - 40, y = 132, textR = R, imgBottom = 0;
@@ -183,16 +231,18 @@
         var cols = 4, cw = (R - L) / cols;
         (b.metrics || []).forEach(function (m, k) {
           var cx = L + (k % cols) * cw, cy = y + Math.floor(k / cols) * 92;
-          x.fillStyle = C.muted; x.font = "500 20px " + FONT; x.fillText(String(m.label).toUpperCase(), cx, cy + 20);
+          x.fillStyle = C.muted; x.font = "500 21px " + FONT; x.fillText(String(m.label), cx, cy + 20);
           x.fillStyle = "#ffffff"; x.font = "800 34px " + FONT; x.fillText(m.value, cx, cy + 62);
         });
         y += Math.ceil((b.metrics || []).length / cols) * 92 + 10;
         if (b.foot) { x.fillStyle = C.blue; x.font = "600 22px " + FONT; wrapLines(x, b.foot, R - L, 2).forEach(function (ln) { x.fillText(ln, L, y + 10); y += 30; }); }
+        x.fillStyle = C.muted; x.font = "500 19px " + FONT;   // these are student exercises, not advice
+        x.fillText("Student work for learning purposes - not investment advice. Figures as of the pitch date.", L, h - 26);
       } else if (b.kind === "stats") {
         (b.stats || []).forEach(function (s, k) {
           var cx = L + k * 230;
           x.fillStyle = "#ffffff"; x.font = "800 84px " + FONT; x.fillText(String(s[0]), cx, y + 80);
-          x.fillStyle = C.muted; x.font = "600 22px " + FONT; x.fillText(String(s[1]).toUpperCase(), cx, y + 116);
+          x.fillStyle = C.muted; x.font = "600 24px " + FONT; x.fillText(String(s[1]), cx, y + 116);
         });
         y += 160;
         var cx2 = L, cy2 = y;
@@ -270,12 +320,12 @@
     grad.addColorStop(0, "#6fa3cf"); grad.addColorStop(0.55, "#b9d6e3"); grad.addColorStop(1, "#f1dfb9");
     sg.fillStyle = grad; sg.fillRect(0, 0, 4, 256);
     scene.background = new THREE.CanvasTexture(sky);
-    scene.fog = new THREE.Fog(0xb9ccb8, 70, 150);
-    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 400);
+    scene.fog = new THREE.Fog(0xc4d4c2, 85, 230);
+    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 700);
 
-    scene.add(new THREE.HemisphereLight(0xdcecf5, 0x3d5a2a, 0.55));
-    var key = new THREE.DirectionalLight(0xffe9c4, 0.75);
-    key.position.set(18, 40, 22); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+    scene.add(new THREE.HemisphereLight(0xe3eef7, 0x46602f, 0.62));
+    var key = new THREE.DirectionalLight(0xffe2b8, 0.78);
+    key.position.set(26, 34, 20); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
     var sc = key.shadow.camera; sc.left = -44; sc.right = 44; sc.top = 44; sc.bottom = -44; sc.near = 1; sc.far = 120;
     scene.add(key);
 
@@ -290,8 +340,8 @@
     }
     lg.globalAlpha = 1;
     var lawnTex = new THREE.CanvasTexture(lawnC);
-    lawnTex.wrapS = lawnTex.wrapT = THREE.RepeatWrapping; lawnTex.repeat.set(60, 60); lawnTex.anisotropy = 8;
-    var floor = new THREE.Mesh(new THREE.PlaneGeometry(360, 360), new THREE.MeshStandardMaterial({ map: lawnTex, roughness: 1 }));
+    lawnTex.wrapS = lawnTex.wrapT = THREE.RepeatWrapping; lawnTex.repeat.set(200, 200); lawnTex.anisotropy = 8;
+    var floor = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.MeshStandardMaterial({ map: lawnTex, roughness: 1 }));
     floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
 
     // plaza + roads
@@ -321,27 +371,35 @@
       x.fillStyle = "#cfc7b6"; x.fillRect(0, 0, w, h);
       x.strokeStyle = "#a99f8b"; x.lineWidth = 6; x.strokeRect(14, 14, w - 28, h - 28);
       x.fillStyle = "#4a4336"; x.textAlign = "center";
-      var parts = String(P.name || "").toUpperCase().split(" ");
+      var parts = String(P.name || "").split(" ");
       x.font = "800 50px " + FONT; x.fillText(parts[0] || "", w / 2, 102);
       x.fillText(parts.slice(1).join(" "), w / 2, 160);
-      x.font = "600 24px " + FONT; x.fillText("PORTFOLIO", w / 2, 210);
+      x.font = "600 26px " + FONT; x.fillText("Portfolio", w / 2, 210);
     });
     for (var f = 0; f < 4; f++) {
       var plate = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.15), new THREE.MeshStandardMaterial({ map: plateTex, roughness: 0.6 }));
       var fa = f * Math.PI / 2;
       plate.position.set(Math.sin(fa) * 1.51, 1.38, Math.cos(fa) * 1.51); plate.rotation.y = fa; statue.add(plate);
     }
-    var fig = buildPerson({ pants: marble, shoe: marbleD, suit: marble, suitD: marbleD, shirt: marble, tie: marbleD, skin: marble, hair: marbleD, eye: marbleK, bcase: marbleD, clasp: marbleK });
-    fig.armL.rotation.set(0, 0, -2.55);        // waving
-    fig.armR.rotation.set(0.15, 0, 0);
-    fig.legL.rotation.x = 0.12; fig.legR.rotation.x = -0.12;
+    var fig = buildPerson({ pants: marble, shoe: marbleD, suit: marble, suitD: marbleD, shirt: marble, tie: marbleD, skin: marble, hair: marbleD, eye: marbleK, eyeW: marble, mouth: marbleK, bcase: marbleD, clasp: marbleK });
+    fig.armL.rotation.set(0, 0, -2.5); fig.elbowL.rotation.set(0, 0, -0.45);   // waving
+    fig.armR.rotation.set(0.1, 0, -0.04); fig.elbowR.rotation.x = -0.1;
+    fig.legL.rotation.x = -0.14; fig.legR.rotation.x = 0.12; fig.kneeR.rotation.x = 0.18;
+    fig.head.rotation.set(-0.08, 0.1, 0);
     fig.root.scale.setScalar(2.2); fig.root.position.y = 2.6; statue.add(fig.root);
-    var hedgeMat = mat(0x3d7531, 0.9, { flatShading: true });
-    [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) {
-      var hb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 1), hedgeMat); hb.scale.y = 0.75;
-      hb.position.set(c[0] * 2.7, 0.4, c[1] * 2.7); hb.castShadow = true; statue.add(hb);
-    });
     scene.add(statue);
+    // a round fountain basin around the statue, with ripples
+    var FOUNT = 4.3;
+    var rim = new THREE.Mesh(new THREE.TorusGeometry(FOUNT, 0.22, 10, 64), mat(0xd6cfc1, 0.75));
+    rim.rotation.x = Math.PI / 2; rim.position.y = 0.42; rim.castShadow = true; rim.receiveShadow = true; scene.add(rim);
+    var wall = new THREE.Mesh(new THREE.CylinderGeometry(FOUNT, FOUNT, 0.42, 64, 1, true), mat(0xc8bfae, 0.85));
+    wall.position.y = 0.21; scene.add(wall);
+    var water = new THREE.Mesh(new THREE.CircleGeometry(FOUNT - 0.05, 64), new THREE.MeshStandardMaterial({ color: 0x6fb3cf, roughness: 0.08, metalness: 0.3, transparent: true, opacity: 0.88 }));
+    water.rotation.x = -Math.PI / 2; water.position.y = 0.32; scene.add(water);
+    var ripples = [0, 1, 2].map(function (k) {
+      var rp = new THREE.Mesh(new THREE.RingGeometry(0.96, 1, 64), new THREE.MeshBasicMaterial({ color: 0xe8f6ff, transparent: true, opacity: 0.5, side: THREE.DoubleSide }));
+      rp.rotation.x = -Math.PI / 2; rp.position.y = 0.335; rp.userData.t = k / 3; scene.add(rp); return rp;
+    });
 
     /* ---------- the towers ---------- */
     var HEIGHTS = [30, 24, 34, 26, 32, 22, 28, 25];
@@ -373,10 +431,10 @@
         x.fillStyle = C.ink; x.font = "800 36px " + FONT; x.textAlign = "center"; x.fillText(s.fkey || "F" + (i + 1), 76, 71);
         x.textAlign = "left"; x.fillStyle = "#ffffff";
         var size = s.label.length > 18 ? 46 : 58; x.font = "800 " + size + "px " + FONT;
-        x.fillText(s.label.toUpperCase(), 148, 76);
+        x.fillText(s.label, 148, 76);
         var v = !!visited[s.id];
         x.fillStyle = v ? C.green : C.blue; x.font = "700 30px " + FONT;
-        x.fillText(v ? "✓ VIEWED" : "● NEW", 148, 128);
+        x.fillText(v ? "✓ Explored" : "● New", 148, 128);
         x.fillStyle = C.muted; x.font = "500 28px " + FONT; x.textAlign = "right"; x.fillText(s.blurb || "", w - 30, 128); x.textAlign = "left";
       };
     }
@@ -443,7 +501,7 @@
         x.strokeStyle = "#ffffff"; x.lineWidth = 4; x.strokeRect(2, 2, w - 4, h - 4);
         x.fillStyle = "#ffffff"; x.fillRect(18, 24, 74, 72);
         x.fillStyle = C.ink; x.font = "800 34px " + FONT; x.textAlign = "center"; x.fillText(s.fkey || "", 55, 72);
-        x.fillStyle = "#ffffff"; x.textAlign = "left"; x.font = "800 " + (s.label.length > 18 ? 34 : 42) + "px " + FONT; x.fillText(s.label.toUpperCase(), 110, 74);
+        x.fillStyle = "#ffffff"; x.textAlign = "left"; x.font = "800 " + (s.label.length > 18 ? 36 : 44) + "px " + FONT; x.fillText(s.label, 110, 74);
       });
       var label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labTex, transparent: true, depthTest: false }));
       label.renderOrder = 5;
@@ -477,22 +535,22 @@
     }
     var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
     var tmp = new THREE.Object3D(), colr = new THREE.Color();
-    var TUFTS = 7000;
+    var TUFTS = 16000;
     var tuft = new THREE.InstancedMesh(new THREE.ConeGeometry(0.07, 0.55, 3), new THREE.MeshStandardMaterial({ roughness: 1 }), TUFTS);
     var tuftCols = [0x3f7a2e, 0x4c8a36, 0x5a9a40, 0x67a648, 0x44742b];
     for (var t = 0, placed = 0; placed < TUFTS && t < TUFTS * 3; t++) {
-      var a = rnd() * Math.PI * 2, rr = Math.sqrt(rnd()) * 60, x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+      var a = rnd() * Math.PI * 2, rr = Math.sqrt(rnd()) * 110, x = Math.cos(a) * rr, z = Math.sin(a) * rr;
       if (onPath(x, z)) continue;
       var hgt = 0.6 + rnd() * 0.9;
       tmp.position.set(x, 0.27 * hgt, z); tmp.rotation.set((rnd() - 0.5) * 0.5, rnd() * 6.3, (rnd() - 0.5) * 0.5); tmp.scale.set(1, hgt, 1);
       tmp.updateMatrix(); tuft.setMatrixAt(placed, tmp.matrix); tuft.setColorAt(placed, colr.setHex(tuftCols[Math.floor(rnd() * tuftCols.length)])); placed++;
     }
     tuft.count = placed; scene.add(tuft);
-    var FLOWERS = 520;
+    var FLOWERS = 1100;
     var flower = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.11, 0), new THREE.MeshStandardMaterial({ roughness: 0.7 }), FLOWERS);
     var petal = [0xffffff, 0xf7d64a, 0xf29bb4, 0xc9a7f0, 0xff9f6b];
     for (var fl = 0, fp = 0; fp < FLOWERS && fl < FLOWERS * 4; fl++) {
-      var fa2 = rnd() * Math.PI * 2, fr = 6 + Math.sqrt(rnd()) * 44, fx = Math.cos(fa2) * fr, fz = Math.sin(fa2) * fr;
+      var fa2 = rnd() * Math.PI * 2, fr = 6 + Math.sqrt(rnd()) * 90, fx = Math.cos(fa2) * fr, fz = Math.sin(fa2) * fr;
       if (onPath(fx, fz)) continue;
       tmp.position.set(fx, 0.2, fz); tmp.rotation.set(0, 0, 0); tmp.scale.setScalar(0.8 + rnd() * 0.6); tmp.updateMatrix();
       flower.setMatrixAt(fp, tmp.matrix); flower.setColorAt(fp, colr.setHex(petal[Math.floor(rnd() * petal.length)])); fp++;
@@ -520,10 +578,39 @@
       tree(Math.cos(m - 0.12) * (R + 4), Math.sin(m - 0.12) * (R + 4), 1.0 + rnd() * 0.4);
       tree(Math.cos(m + 0.1) * (ringR + 3.2), Math.sin(m + 0.1) * (ringR + 3.2), 0.85 + rnd() * 0.3);
     });
-    for (var w = 0; w < 110; w++) {
-      var ta = rnd() * Math.PI * 2, trr = 36 + rnd() * 30, tx = Math.cos(ta) * trr, tz = Math.sin(ta) * trr;
+    for (var w = 0; w < 90; w++) {
+      var ta = rnd() * Math.PI * 2, trr = 36 + rnd() * 18, tx = Math.cos(ta) * trr, tz = Math.sin(ta) * trr;
       if (!inTower(tx, tz, 2)) tree(tx, tz, 0.9 + rnd() * 0.8);
     }
+    // the outskirts: a forest that keeps going (drawn as instances so it stays fast)
+    (function forest() {
+      var COUNT = 900, trunkI = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.16, 0.24, 1.4, 6), trunkMat, COUNT);
+      var roundI = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1.15, 1), mat(0xffffff, 0.85, { flatShading: true }), COUNT);
+      var pineI = new THREE.InstancedMesh(new THREE.ConeGeometry(1.3, 3.4, 7), mat(0xffffff, 0.85, { flatShading: true }), COUNT);
+      var leaf = [0x2f6630, 0x3b7536, 0x4a843d, 0x285a32, 0x356b2f, 0x447a36];
+      var o = new THREE.Object3D(), c = new THREE.Color(), nr = 0, np = 0;
+      for (var k = 0; k < COUNT; k++) {
+        var a = rnd() * Math.PI * 2, r = 52 + Math.pow(rnd(), 0.8) * 150, x = Math.cos(a) * r, z = Math.sin(a) * r;
+        var sz = 1.0 + rnd() * 1.1 + (r > 120 ? 0.5 : 0);
+        o.position.set(x, 0.7 * sz, z); o.rotation.set(0, rnd() * 6.3, 0); o.scale.setScalar(sz); o.updateMatrix(); trunkI.setMatrixAt(k, o.matrix);
+        c.setHex(leaf[Math.floor(rnd() * leaf.length)]);
+        if (rnd() < 0.45) {
+          o.position.set(x, 2.6 * sz, z); o.scale.set(sz, sz * (0.9 + rnd() * 0.4), sz); o.updateMatrix(); pineI.setMatrixAt(np, o.matrix); pineI.setColorAt(np, c); np++;
+        } else {
+          o.position.set(x, 2.1 * sz, z); o.scale.set(sz * (0.9 + rnd() * 0.3), sz * (0.85 + rnd() * 0.3), sz); o.updateMatrix(); roundI.setMatrixAt(nr, o.matrix); roundI.setColorAt(nr, c); nr++;
+        }
+      }
+      roundI.count = nr; pineI.count = np;
+      [trunkI, roundI, pineI].forEach(function (m) { m.castShadow = true; scene.add(m); });
+      // gentle green hills on the horizon
+      var hillMat = mat(0x5d8f45, 1, { flatShading: true });
+      for (var h = 0; h < 26; h++) {
+        var ha = h / 26 * Math.PI * 2 + rnd() * 0.2, hr = 230 + rnd() * 60;
+        var hill = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), hillMat);
+        hill.scale.set(45 + rnd() * 40, 14 + rnd() * 18, 40 + rnd() * 30);
+        hill.position.set(Math.cos(ha) * hr, -1, Math.sin(ha) * hr); scene.add(hill);
+      }
+    })();
     var bushMat = mat(0x3d7531, 0.9, { flatShading: true });
     for (var bsh = 0, bp = 0; bp < 34 && bsh < 300; bsh++) {
       var ba = rnd() * Math.PI * 2, br = 7 + rnd() * 14, bx = Math.cos(ba) * br, bz = Math.sin(ba) * br;
@@ -531,16 +618,91 @@
       var bush = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55 + rnd() * 0.3, 1), bushMat); bush.position.set(bx, 0.35, bz); bush.scale.y = 0.75; bush.castShadow = true; scene.add(bush); bp++;
     }
 
+    /* ---------- life in the city: benches, lamps, people, birds ---------- */
+    var woodMat = mat(0x9a6a43, 0.8), ironMat = mat(0x2b3532, 0.5);
+    function bench(a, r) {
+      var g = new THREE.Group();
+      var seat = box(2.2, 0.1, 0.62, woodMat); seat.position.y = 0.58; g.add(seat);
+      var back = box(2.2, 0.5, 0.08, woodMat); back.position.set(0, 0.95, -0.3); back.rotation.x = -0.12; g.add(back);
+      [-0.95, 0.95].forEach(function (x) { var lg2 = box(0.08, 0.58, 0.6, ironMat); lg2.position.set(x, 0.29, 0); g.add(lg2); });
+      g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); g.lookAt(0, 0, 0); scene.add(g);
+      return g;
+    }
+    function lamp(a, r) {
+      var g = new THREE.Group();
+      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 3.6, 8), ironMat); pole.position.y = 1.8; pole.castShadow = true; g.add(pole);
+      var arm2 = box(0.06, 0.06, 0.6, ironMat); arm2.position.set(0, 3.55, 0.25); g.add(arm2);
+      var bulb = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 10), new THREE.MeshStandardMaterial({ color: 0xfff1cf, emissive: 0xffd98a, emissiveIntensity: 0.9 }));
+      bulb.position.set(0, 3.4, 0.5); g.add(bulb);
+      var shade = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.22, 12), ironMat); shade.position.set(0, 3.62, 0.5); g.add(shade);
+      g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); g.lookAt(0, 0, 0); scene.add(g);
+    }
+    var benches = [];
+    nodes.forEach(function (n, q) {
+      var m = n.ang + Math.PI / N;
+      benches.push({ a: m, g: bench(m, ringR + 2.4) });
+      lamp(n.ang + 0.13, ringR + 1.3); lamp(n.ang - 0.13, ringR + 1.3);
+    });
+    [0, 2, 4, 6].forEach(function (q) { lamp(q * Math.PI / 2 + Math.PI / 4, PLAZA + 0.6); });
+
+    // people: a few walking the ring road, a few out by the towers, two resting on benches
+    var LOOKS = [
+      { top: 0xc44f3d, legs: 0x2f3e57, skin: 0xf0c9a5, hair: 0x3b2a1e },
+      { top: 0x3f7fbf, legs: 0x26303b, skin: 0x8d5a3b, hair: 0x15100c },
+      { top: 0xe0b33e, legs: 0x4a3f35, skin: 0xd9a77e, hair: 0x6b4423 },
+      { top: 0x6a5acd, legs: 0x2b2b30, skin: 0xf3d2b5, hair: 0xb8892f },
+      { top: 0x2f8f6f, legs: 0x39404a, skin: 0x6b4430, hair: 0x0f0c0a },
+      { top: 0xe07aa0, legs: 0x2f3e57, skin: 0xe8b993, hair: 0x5a3a24 },
+      { top: 0xf2f2f2, legs: 0x1f2a3a, skin: 0xc68d63, hair: 0x241a12 },
+      { top: 0x8a6b4f, legs: 0x2a2a2a, skin: 0xf5d6bc, hair: 0x8f5b30 }
+    ];
+    function person(look, scale) {
+      var Mx = { suit: mat(look.top, 0.75), suitD: mat(new THREE.Color(look.top).multiplyScalar(0.8).getHex(), 0.75), pants: mat(look.legs, 0.8),
+        skin: mat(look.skin, 0.8), hair: mat(look.hair, 0.7), shirt: mat(look.top, 0.75), shoe: mat(0x2a2522, 0.5),
+        eye: mat(0x1d1712, 0.3), eyeW: mat(0xffffff, 0.4), mouth: mat(0x8a4b3c, 0.6) };
+      var pp = buildPerson(Mx, { briefcase: false });
+      pp.root.scale.setScalar(scale || 1.3);
+      scene.add(pp.root); return pp;
+    }
+    var people = [];
+    for (var pi = 0; pi < 7; pi++) {
+      var outer = pi >= 5;
+      people.push({ p: person(LOOKS[pi % LOOKS.length], 1.22 + (pi % 3) * 0.06), a: pi * 0.9 + 0.3, r: outer ? R + 7 + (pi % 2) * 2 : ringR + (pi % 2 ? 0.45 : -0.45),
+        dir: pi % 2 ? 1 : -1, speed: 1.6 + (pi % 3) * 0.35, phase: pi });
+    }
+    [0, 4].forEach(function (bi, k) {   // sitting on a bench
+      var bp2 = person(LOOKS[(6 + k) % LOOKS.length], 1.25), B = benches[bi];
+      bp2.root.position.set(Math.cos(B.a) * (ringR + 2.35), 0.02, Math.sin(B.a) * (ringR + 2.35));
+      bp2.root.rotation.y = Math.atan2(-Math.cos(B.a), -Math.sin(B.a));
+      bp2.legL.rotation.x = bp2.legR.rotation.x = -1.45; bp2.kneeL.rotation.x = bp2.kneeR.rotation.x = 1.45;
+      bp2.body.position.y = -0.48 / 1.0; bp2.elbowL.rotation.x = bp2.elbowR.rotation.x = -0.9; bp2.armL.rotation.x = bp2.armR.rotation.x = -0.25;
+      people.push({ p: bp2, seated: true });
+    });
+
+    // birds circling high above
+    var birdMat = new THREE.MeshBasicMaterial({ color: 0x2a3a40, side: THREE.DoubleSide });
+    var birds = [];
+    for (var bd = 0; bd < 6; bd++) {
+      var bird = new THREE.Group(), wings = [];
+      [-1, 1].forEach(function (sd) {
+        var wg = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.22), birdMat); wg.position.x = sd * 0.35;
+        var pivot = new THREE.Group(); pivot.add(wg); bird.add(pivot); wings.push({ pv: pivot, sd: sd });
+      });
+      scene.add(bird);
+      birds.push({ g: bird, wings: wings, r: 16 + bd * 3.2, h: 15 + (bd % 3) * 2.5, a: bd * 1.1, sp: (0.22 + (bd % 2) * 0.08) * (bd % 2 ? 1 : -1), ph: bd });
+    }
+
     /* ---------- the banker ---------- */
     var M = { suit: mat(0x1f3556, 0.6), suitD: mat(0x172a46, 0.6), pants: mat(0x1d2738, 0.7), skin: mat(0xe7c29f, 0.8), hair: mat(0x20160f, 0.6),
-      shirt: mat(0xf5f5f5, 0.6), tie: mat(0xb3243a, 0.5), shoe: mat(0x080808, 0.35), bcase: mat(0x5c3a1e, 0.55), clasp: mat(0xd4a62a, 0.3), eye: mat(0x141414) };
+      shirt: mat(0xf5f5f5, 0.6), tie: mat(0xb3243a, 0.5), shoe: mat(0x1a1410, 0.35), bcase: mat(0x5c3a1e, 0.55), clasp: mat(0xd4a62a, 0.3),
+      eye: mat(0x1d1712, 0.3), eyeW: mat(0xffffff, 0.4), mouth: mat(0x8a4b3c, 0.6) };
     var person = buildPerson(M), banker = person.root;
     var tagTex = canvasTex(256, 64, function (x, w, h) {
       x.fillStyle = "#8fd3ff"; x.fillRect(0, 0, w, h);
-      x.fillStyle = "#13201b"; x.font = "800 32px " + FONT; x.textAlign = "center"; x.fillText((opts.name || "").toUpperCase(), w / 2, 43);
+      x.fillStyle = "#13201b"; x.font = "800 32px " + FONT; x.textAlign = "center"; x.fillText(opts.name || "", w / 2, 43);
     });
     var tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: tagTex, depthTest: false }));
-    tag.scale.set(1.6, 0.4, 1); tag.position.y = 3.15; tag.renderOrder = 10; banker.add(tag);
+    tag.scale.set(1.6, 0.4, 1); tag.position.y = 2.95; tag.renderOrder = 10; banker.add(tag);
     var shadowDisc = new THREE.Mesh(new THREE.CircleGeometry(0.75, 32), new THREE.MeshBasicMaterial({ color: 0x1f3317, transparent: true, opacity: 0.35 }));
     shadowDisc.rotation.x = -Math.PI / 2; shadowDisc.position.y = 0.035; scene.add(shadowDisc);
     banker.scale.setScalar(1.35);
@@ -557,6 +719,7 @@
       raf: null, clock: new THREE.Clock(), visited: visited,
       onActive: opts.onActive || function () {}, onOpen: opts.onOpen || function () {}, onVisit: opts.onVisit || function () {},
       inside: -1, interiors: {}, busy: false, inTower: inTower, tag: tag,
+      people: people, birds: birds, ripples: ripples, FOUNT: FOUNT,
       camPos: new THREE.Vector3(0, 34, 40), camLook: new THREE.Vector3(0, 2, 4)
     };
 
@@ -570,6 +733,8 @@
     bindInput();
     resize();
     snapCamera();
+
+
 
     return true;
   }
@@ -627,7 +792,7 @@
     });
     var lintel = box(4.4, 0.4, 0.5, trim); lintel.position.set(0, 4.3, zFront); scene.add(lintel);
     var exitTex = canvasTex(256, 64, function (x, w) {
-      x.fillStyle = C.bg; x.fillRect(0, 0, w, 64); x.fillStyle = C.green; x.font = "800 34px " + FONT; x.textAlign = "center"; x.fillText("EXIT", w / 2, 45);
+      x.fillStyle = C.bg; x.fillRect(0, 0, w, 64); x.fillStyle = C.green; x.font = "800 34px " + FONT; x.textAlign = "center"; x.fillText("Exit", w / 2, 45);
     });
     var exitSign = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), new THREE.MeshBasicMaterial({ map: exitTex }));
     exitSign.position.set(0, 4.85, zFront - 0.05); exitSign.rotation.y = Math.PI; scene.add(exitSign);
@@ -639,7 +804,7 @@
       x.fillStyle = C.bg; x.fillRect(0, 0, w, h);
       x.fillStyle = "#ffffff"; x.fillRect(48, 70, 150, 92);
       x.fillStyle = C.ink; x.font = "800 58px " + FONT; x.textAlign = "center"; x.fillText(sec.fkey || "", 123, 136);
-      x.textAlign = "left"; x.fillStyle = "#ffffff"; x.font = "800 " + (sec.label.length > 18 ? 74 : 92) + "px " + FONT; x.fillText(sec.label.toUpperCase(), 232, 146);
+      x.textAlign = "left"; x.fillStyle = "#ffffff"; x.font = "800 " + (sec.label.length > 18 ? 78 : 96) + "px " + FONT; x.fillText(sec.label, 232, 146);
       x.fillStyle = C.muted; x.font = "500 34px " + FONT;
       var intro = sec.intro || sec.blurb || "";
       wrapLines(x, intro, w - 100, 3).forEach(function (ln, k) { x.fillText(ln, 50, 238 + k * 46); });
@@ -678,7 +843,22 @@
       }
       return { b: b, x: bx, z: bz, group: g, frameMat: frameMat, spot: spot, tex: tex, screen: screen };
     });
-    return { i: i, scene: scene, boards: list, zFront: zFront, zBack: zBack, W: W, wallTex: wallTex };
+    // a visitor reading one of the billboards
+    var visitor = null;
+    if (list.length >= 2) {
+      var VL = [[0x3f7fbf, 0x26303b, 0x8d5a3b, 0x15100c], [0xc44f3d, 0x2f3e57, 0xf0c9a5, 0x3b2a1e], [0x2f8f6f, 0x39404a, 0xd9a77e, 0x6b4423], [0x6a5acd, 0x2b2b30, 0xf3d2b5, 0xb8892f]][i % 4];
+      var vp = buildPerson({ suit: mat(VL[0], 0.75), suitD: mat(VL[0], 0.75), pants: mat(VL[1], 0.8), skin: mat(VL[2], 0.8), hair: mat(VL[3], 0.7), shirt: mat(VL[0], 0.75),
+        shoe: mat(0x2a2522, 0.5), eye: mat(0x1d1712, 0.3), eyeW: mat(0xffffff, 0.4), mouth: mat(0x8a4b3c, 0.6) }, { briefcase: false });
+      var tb = list[list.length - 1];
+      vp.root.scale.setScalar(1.28);
+      vp.root.position.set(tb.x + (tb.x >= 0 ? 1.6 : -1.6), 0, tb.z + 3.3);
+      vp.root.rotation.y = Math.PI + (tb.x >= 0 ? 0.35 : -0.35);
+      vp.armL.rotation.x = -0.15; vp.elbowL.rotation.x = -1.6; vp.elbowL.rotation.y = 0.4;   // hand on chin
+      vp.head.rotation.x = -0.12;
+      scene.add(vp.root);
+      visitor = vp;
+    }
+    return { i: i, scene: scene, boards: list, zFront: zFront, zBack: zBack, W: W, wallTex: wallTex, visitor: visitor };
   }
 
   /* ---------------------------------------------------------------
@@ -721,6 +901,97 @@
       S.vy = 0; S.jumping = false;
     };
     if (instant) { go(); snapCamera(); } else withFade(go);
+  }
+
+  /* ---------------------------------------------------------------
+     guided tour: tower by tower, billboard by billboard, all on its own
+     --------------------------------------------------------------- */
+  var MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+  function nowKey() { var d = new Date(); return d.getFullYear() * 12 + d.getMonth(); }
+  // "May 2026 - Oct 2026", "Aug 2026 - Present", "February 23, 2026" → [end, start] as month numbers
+  function recency(text) {
+    var re = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?(?:\s+\d{1,2}(?:,|(?=\s+\d{4})))?(?:\s+(\d{4}))?|(\d{4})|(present)/gi, m, pts = [], now = nowKey();
+    while ((m = re.exec(String(text || "")))) {
+      if (m[4]) pts.push({ k: now });
+      else if (m[1]) pts.push({ mo: MONTHS[m[1].toLowerCase().slice(0, 3)], y: m[2] ? +m[2] : null });
+      else if (m[3]) pts.push({ mo: 11, y: +m[3] });
+    }
+    for (var i = pts.length - 1, ny = null; i >= 0; i--) { if (pts[i].y) ny = pts[i].y; else if (pts[i].mo != null) pts[i].y = ny; }
+    var keys = pts.map(function (p) { return p.k != null ? p.k : (p.y || 0) * 12 + p.mo; });
+    if (!keys.length) return [0, 0];
+    return [Math.min(now, Math.max.apply(null, keys)), Math.min.apply(null, keys)];
+  }
+  // which billboards to visit, in which order
+  function tourOrder(sec, boards) {
+    var idx = boards.map(function (b, k) { return k; });
+    if (sec.type === "about") return idx.length ? [0] : [];                       // just the intro with your name
+    if (sec.id === "pitches" || sec.id === "experience" || sec.id === "extracurriculars") {   // most recent first
+      return idx.sort(function (a, b) {
+        var ra = recency(boards[a].b.when), rb = recency(boards[b].b.when);
+        return (rb[0] - ra[0]) || (rb[1] - ra[1]) || (a - b);
+      });
+    }
+    if (sec.id === "cases") {   // biggest cash prize, then best placement, then most recent
+      var cash = function (k) { var m = /\$\s*([\d,]+)/.exec(boards[k].b.badge || ""); return m ? +m[1].replace(/,/g, "") : 0; };
+      var place = function (k) {
+        var r = boards[k].b.badge || "", m = /(\d+)\s*(st|nd|rd|th)/i.exec(r);
+        if (m) return +m[1];
+        if (/semi/i.test(r)) return 5;
+        if (/final/i.test(r)) return 4;
+        return 99;
+      };
+      return idx.sort(function (a, b) {
+        return (cash(b) - cash(a)) || (place(a) - place(b)) || (recency(boards[b].b.when)[0] - recency(boards[a].b.when)[0]) || (a - b);
+      });
+    }
+    return idx;                                                                   // front to back
+  }
+  function dwell(b) {
+    var txt = [b.title, b.sub, b.body, b.note].concat(b.bullets || [], b.tags || []).join(" ");
+    return Math.max(6, Math.min(13, 4.5 + txt.length / 45));
+  }
+  function startTour() {
+    if (!S) return;
+    cancel();
+    S.tour = { k: 0, phase: "travel", order: [], j: -1, wait: 0 };
+    if (S.inside === 0) { S.tour.phase = "boards"; S.tour.wait = 0.4; }
+    else travelTo(0);
+  }
+  function stopTour() { if (S && S.tour) { S.tour = null; S.promptKey = ""; } }
+  function tourStep(dt) {
+    var T = S.tour, b = S.banker.position;
+    if (!T || S.busy || S.paused) return;
+    var idle = !S.path && !S.pathDone && !S.arriveT;
+    if (T.phase === "travel") {
+      if (S.inside === T.k && idle) { T.phase = "boards"; T.j = -1; T.wait = 0.5; T.order = null; }
+      else if (S.inside !== T.k && S.inside < 0 && idle && !S.target) travelTo(T.k);   // got nudged off the route
+      return;
+    }
+    if (T.phase === "boards") {
+      var I = S.interiors[S.inside];
+      if (!T.order) T.order = tourOrder(S.sections[S.inside], I.boards);
+      if (!idle) return;
+      if (T.wait > 0) { T.wait -= dt; return; }
+      T.j++;
+      if (T.j < T.order.length) {
+        var bd = I.boards[T.order[T.j]], fz = bd.z + 2.5;
+        S.path = [new THREE.Vector3(0, 0, b.z), new THREE.Vector3(0, 0, fz), new THREE.Vector3(bd.x, 0, fz)];   // up the middle aisle
+        T.wait = dwell(bd.b);
+      } else {
+        T.phase = "exit";
+        S.path = [new THREE.Vector3(0, 0, b.z), new THREE.Vector3(0, 0, I.zFront - 0.4), new THREE.Vector3(0, 0, I.zFront + 0.6)];
+      }
+      return;
+    }
+    if (T.phase === "exit") {
+      if (S.inside < 0 && idle) {
+        T.k++;
+        if (T.k >= S.N) { T.phase = "done"; T.wait = 6; }
+        else { T.phase = "travel"; travelTo(T.k); }
+      }
+      return;
+    }
+    if (T.phase === "done") { T.wait -= dt; if (T.wait <= 0) stopTour(); }
   }
 
   /* ---------------------------------------------------------------
@@ -781,6 +1052,7 @@
       if (S.paused || e.ctrlKey || e.metaKey || e.altKey) return;
       var k = KEYMAP[e.code];
       if (k) { S.keys[k] = true; e.preventDefault(); return; }
+      if (e.code === "KeyN" && S.tour) { e.preventDefault(); if (S.tour.phase === "boards" && !S.path) S.tour.wait = 0; return; }
       if (e.code === "Space") { e.preventDefault(); jump(); }
     });
     document.addEventListener("keyup", function (e) {
@@ -818,6 +1090,7 @@
     }
     S.renderer.domElement.addEventListener("click", function (e) {
       if (!S || S.paused || S.busy) return;
+      stopTour();
       aim(e);
       if (S.inside >= 0) {
         var bd = pickBoard();
@@ -877,11 +1150,12 @@
     var px = b.x, pz = b.z;
 
     if (!S.paused && !S.busy && (kx || kz)) {
+      if (S.tour) stopTour();
       if (S.path || S.arriveT) cancel();
       var l = Math.sqrt(kx * kx + kz * kz);
       b.x += kx / l * speed * dt; b.z += kz / l * speed * dt;
       S.heading = Math.atan2(kx, kz); moving = true;
-    } else if (!S.busy && !S.paused && S.path && S.path.length) {
+    } else if (!S.busy && !S.paused && S.path && S.path.length) {   // following a route
       var t = S.path[0], dx = t.x - b.x, dz = t.z - b.z, d = Math.sqrt(dx * dx + dz * dz), stp = (S.run ? S.RUN : S.WALK * 1.15) * dt;
       S.heading = Math.atan2(dx, dz);
       if (d <= stp) {
@@ -906,6 +1180,7 @@
         if (Math.abs(b.x) < 1.7) { if (b.z > I.zFront + 0.2 && !S.busy) exitBuilding(); }
         else b.z = I.zFront - 0.5;
       }
+      if (I.visitor) I.visitor.body.position.y = Math.sin(S.clock.elapsedTime * 2) * 0.008;
       I.boards.forEach(function (bd) {   // can't walk through a billboard stand
         var ox = 3.1 - Math.abs(b.x - bd.x), oz = 0.75 - Math.abs(b.z - bd.z);
         if (ox > 0 && oz > 0) { if (ox < oz) b.x += ox * Math.sign(b.x - bd.x || 1); else b.z += oz * Math.sign(b.z - bd.z || 1); }
@@ -913,7 +1188,8 @@
     } else {
       var r = Math.sqrt(b.x * b.x + b.z * b.z);
       if (r > S.LIMIT) { b.x *= S.LIMIT / r; b.z *= S.LIMIT / r; }
-      if (r < 2.7) { var rr = r || 0.01; b.x *= 2.7 / rr; b.z *= 2.7 / rr; }   // the statue
+      var keep = S.FOUNT + 0.55;
+      if (r < keep) { var rr = r || 0.01; b.x *= keep / rr; b.z *= keep / rr; }   // the fountain around the statue
       var hit = S.inTower(b.x, b.z, 0.1);
       if (hit) {
         // walking into the front door takes you inside; any other wall stops you
@@ -924,21 +1200,16 @@
       }
     }
 
+    tourStep(dt);
+
     if (S.jumping) { S.vy -= S.GRAVITY * dt; b.y += S.vy * dt; if (b.y <= 0) { b.y = 0; S.vy = 0; S.jumping = false; } }
     S.shadowDisc.position.x = b.x; S.shadowDisc.position.z = b.z;
     var sScale = 1 - Math.min(0.6, b.y / 6); S.shadowDisc.scale.setScalar(sScale); S.shadowDisc.material.opacity = 0.35 * sScale;
 
     var diff = angDiff(S.heading, S.banker.rotation.y);
     S.banker.rotation.y += diff * Math.min(1, dt * 12);
-    var Pp = S.person;
-    if (moving) S.walkPhase += dt * (S.run ? 14 : 9.5);
-    var amp = S.run ? 0.95 : 0.6, swing = moving ? Math.sin(S.walkPhase) * amp : 0;
-    var lL = swing, lR = -swing, aL = -swing * 0.75, aR = swing * 0.45;
-    if (S.jumping) { lL = -0.55; lR = 0.35; aL = -2.4; aR = -0.6; }
-    Pp.legL.rotation.x += (lL - Pp.legL.rotation.x) * 0.35; Pp.legR.rotation.x += (lR - Pp.legR.rotation.x) * 0.35;
-    Pp.armL.rotation.x += (aL - Pp.armL.rotation.x) * 0.3; Pp.armR.rotation.x += (aR - Pp.armR.rotation.x) * 0.3;
-    Pp.body.position.y = (moving && !S.jumping) ? Math.abs(Math.sin(S.walkPhase)) * (S.run ? 0.14 : 0.08) : Math.sin(S.clock.elapsedTime * 2) * 0.01;
-    Pp.body.rotation.x = S.run && moving && !S.jumping ? 0.12 : 0;
+    if (moving) S.walkPhase += dt * (S.run ? 13 : 8.5);
+    animatePerson(S.person, S.walkPhase, moving, S.run, S.jumping, dt, S.clock.elapsedTime);
 
     // what's near: a tower door outside, a billboard inside
     var near = null, prompt = null;
@@ -956,9 +1227,9 @@
       S.activeBoard = ab;
       S.tag.visible = !ab;            // the name tag would sit on top of the billboard
       var sec = S.sections[S.inside];
-      if (ab) { near = S.inside; prompt = "▶ " + ab.b.title + " — PRESS ENTER FOR DETAILS"; }
-      else if (b.z > I.zFront - 3.2 && Math.abs(b.x) < 3) prompt = "WALK OUT THE DOOR OR PRESS ESC TO GO BACK OUTSIDE";
-      else prompt = sec.label.toUpperCase() + " · WALK UP TO A BILLBOARD · ESC TO LEAVE";
+      if (ab) { near = S.inside; prompt = ab.b.title + " - press Enter to read more"; }
+      else if (b.z > I.zFront - 3.2 && Math.abs(b.x) < 3) prompt = "Walk out the door or press Esc to head back outside";
+      else prompt = sec.label + " · walk up to a billboard to read it · Esc to leave";
     } else {
       S.tag.visible = true;
       var nd = S.NEAR_DOOR;
@@ -968,10 +1239,42 @@
         n.glow.intensity += ((n.i === near ? 2.2 : 0) - n.glow.intensity) * 0.15;
         n.stopMat.color.setHex(on ? BLUE : WHITE);
       });
-      if (near !== null) prompt = "▶ " + S.sections[near].label.toUpperCase() + " — PRESS ENTER TO GO INSIDE";
+      if (near !== null) prompt = "Press Enter to go inside " + S.sections[near].label;
+    }
+    if (S.tour) {
+      var T2 = S.tour;
+      if (T2.phase === "done") prompt = "That's the tour! Thanks for visiting · walk around as much as you like";
+      else if (T2.phase === "boards" && S.activeBoard && !S.path) prompt = "Guided tour · " + S.activeBoard.b.title + " - press Enter to read more · N for the next billboard · Esc to stop";
+      else if (T2.phase === "boards") prompt = "Guided tour · " + S.sections[S.inside >= 0 ? S.inside : T2.k].label + " · walking to the next billboard… · Esc to stop";
+      else if (T2.phase === "exit") prompt = "Guided tour · heading back outside…";
+      else prompt = "Guided tour · walking to " + S.sections[Math.min(T2.k, S.N - 1)].label + "… · Esc to stop";
     }
     var pk = near + "|" + prompt + "|" + S.inside;
     if (pk !== S.promptKey) { S.promptKey = pk; S.active = near; S.onActive(near, prompt); }
+
+    if (!I) {
+      var tt = S.clock.elapsedTime;
+      S.people.forEach(function (o) {
+        if (o.seated) { o.p.head.rotation.y = Math.sin(tt * 0.5 + o.p.root.position.x) * 0.3; return; }
+        o.a += o.dir * o.speed / o.r * dt; o.phase += dt * 7.5;
+        var px2 = Math.cos(o.a) * o.r, pz2 = Math.sin(o.a) * o.r;
+        o.p.root.position.set(px2, 0, pz2);
+        o.p.root.rotation.y = Math.atan2(-Math.sin(o.a) * o.dir, Math.cos(o.a) * o.dir);
+        animatePerson(o.p, o.phase, true, false, false, dt, tt);
+      });
+      S.birds.forEach(function (o) {
+        o.a += o.sp * dt; o.ph += dt * 9;
+        o.g.position.set(Math.cos(o.a) * o.r, o.h + Math.sin(o.ph * 0.2) * 0.6, Math.sin(o.a) * o.r);
+        o.g.rotation.y = -o.a + (o.sp > 0 ? 0 : Math.PI);
+        var flap = Math.sin(o.ph) * 0.6;
+        o.wings.forEach(function (w) { w.pv.rotation.z = w.sd * flap; });
+      });
+      S.ripples.forEach(function (rp) {
+        rp.userData.t = (rp.userData.t + dt * 0.22) % 1;
+        var sc2 = 0.6 + rp.userData.t * (S.FOUNT - 0.8); rp.scale.set(sc2, sc2, sc2);
+        rp.material.opacity = 0.55 * (1 - rp.userData.t);
+      });
+    }
 
     // camera; towers between the camera and the banker turn see-through
     camGoal(S._g || (S._g = new THREE.Vector3()), S._l || (S._l = new THREE.Vector3()));
@@ -1014,9 +1317,12 @@
     start: start,
     stop: stop,
     resize: resize,
-    travelTo: travelTo,
-    teleport: teleport,
-    cancel: function () { if (!S) return; if (S.path || S.pathDone) cancel(); else if (S.inside >= 0) exitBuilding(); },
+    travelTo: function (k) { stopTour(); travelTo(k); },
+    teleport: function (k) { stopTour(); teleport(k); },
+    startTour: startTour,
+    stopTour: stopTour,
+    touring: function () { return !!(S && S.tour); },
+    cancel: function () { if (!S) return; if (S.tour) { stopTour(); cancel(); return; } if (S.path || S.pathDone) cancel(); else if (S.inside >= 0) exitBuilding(); },
     jump: jump,
     // Enter: outside at a door → go in; inside at the exit → leave; otherwise false (script.js opens the details window)
     primary: function () {

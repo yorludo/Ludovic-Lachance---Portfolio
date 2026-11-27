@@ -5,28 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ludovic Lachance - Portfolio</title>
   <meta name="description" content="Ludovic Lachance's portfolio: about, pitches, case competitions, entrepreneurship, experience, extracurriculars, skills and socials.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261125a">
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css?v=20261126b">
 </head>
 <body>
+<a class="skip-link" href="#classic">Skip to the text version of this portfolio</a>
 
 <!-- =============================================================
      BOOT SCREEN
      ============================================================= -->
 <section class="screen boot" id="screen-boot" aria-label="Start screen">
   <div class="boot-inner">
-    <div class="boot-logo"><span class="boot-name" id="boot-name">LUDOVIC LACHANCE -&nbsp;PORTFOLIO</span></div>
+    <div class="boot-logo"><span class="boot-name" id="boot-name">Ludovic Lachance - Portfolio</span></div>
     <div class="boot-stage">
       <div class="boot-banker banker-art walking" id="boot-banker"></div>
     </div>
     <pre class="boot-log" id="boot-log" aria-live="polite"></pre>
     <div class="boot-actions">
-      <a href="#map" class="t-btn t-btn-amber t-btn-lg" id="boot-start">PRESS ENTER TO START<span class="caret" aria-hidden="true"></span></a>
-      <p class="boot-hint">Walk with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrow keys · hold <kbd>SHIFT</kbd> to run · <kbd>SPACE</kbd> to jump · <kbd>ENTER</kbd> near a sign to open it</p>
+      <a href="#map" class="t-btn t-btn-amber t-btn-lg" id="boot-start">Come on in →</a>
+      <p class="boot-hint">Walk with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrow keys, hold <kbd>Shift</kbd> to run and press <kbd>Space</kbd> to jump. You can also press <kbd>Enter</kbd> to start.</p>
       <a href="#classic" class="t-link">Prefer a plain page? Open the classic view</a>
       <a href="?map=2d#map" class="t-link" id="boot-2d">Or explore the original 2D map</a>
+      <a href="#legal" class="t-link">Privacy, terms &amp; accessibility</a>
     </div>
   </div>
 </section>
@@ -36,20 +36,24 @@
      ============================================================= -->
 <section class="screen term" id="screen-map" aria-label="Portfolio map">
   <header class="term-top">
-    <div class="term-brand"><span class="brand-block" id="brand-name"></span><span class="brand-go" hidden></span></div>
+    <a href="#map" class="term-brand" aria-label="Back to the city">
+      <img class="brand-avatar" id="brand-avatar" alt="">
+      <span class="brand-block" id="brand-name"></span><span class="brand-go" hidden></span>
+    </a>
     <div class="term-spacer"></div>
     <div class="term-meta">
-      <span class="meta-item">VIEWED <b id="visited-count">0/8</b></span>
-      <span class="meta-item clock" id="clock">--:--:--</span>
+      <span class="progress-dots" id="progress-dots" aria-hidden="true"></span>
+      <span class="meta-item">Explored <b id="visited-count">0/8</b></span>
+      <span class="meta-item clock" id="clock" hidden>--:--:--</span>
     </div>
   </header>
 
-  <div class="tape" aria-hidden="true"><div class="tape-track" id="tape-track"></div></div>
+  <nav class="tape" aria-label="Sections"><div class="tape-track" id="tape-track"></div></nav>
 
   <main class="map" id="map" tabindex="-1" aria-label="Map. Use W A S D or the arrow keys to walk, Enter to open a section, 1 to 8 to travel.">
     <div class="world" id="world">
       <svg class="world-art" id="world-art" width="1600" height="1600" viewBox="0 0 1600 1600" aria-hidden="true"></svg>
-      <div class="hub" id="hub" aria-hidden="true"><span>HQ</span><small>START</small></div>
+      <div class="hub" id="hub" aria-hidden="true"><span>Start</span><small>here</small></div>
       <div id="nodes"></div>
       <div class="banker" id="banker">
         <span class="banker-tag" id="banker-tag">LUDOVIC</span>
@@ -59,25 +63,46 @@
 
     <button type="button" class="prompt" id="prompt" hidden></button>
 
+    <!-- first-visit welcome -->
+    <div class="welcome" id="welcome" hidden>
+      <div class="welcome-card" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+        <img class="welcome-photo" id="welcome-photo" alt="">
+        <h2 id="welcome-title">Hi, I'm Ludovic</h2>
+        <p id="welcome-text">Welcome to my portfolio! Each tower in this little city holds a part of my story: my pitches, case competitions, ventures, experience and more. Walk up to a tower and step inside to explore.</p>
+        <ul class="welcome-how">
+          <li><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows</span><em>Walk around (hold <kbd>Shift</kbd> to run)</em></li>
+          <li><span><kbd>Enter</kbd> or click</span><em>Go inside a tower, or read a billboard</em></li>
+          <li><span><kbd>Esc</kbd></span><em>Close a window or leave a tower</em></li>
+          <li class="touch-only"><span>On your phone</span><em>Tap a tower to walk there and step inside, then tap a billboard to read it. Use the arrow pad to walk around.</em></li>
+        </ul>
+        <div class="welcome-actions">
+          <button type="button" class="t-btn t-btn-amber" id="welcome-tour">Take the guided tour</button>
+          <button type="button" class="t-btn" id="welcome-explore">I'll explore on my own</button>
+        </div>
+        <a href="#classic" class="t-link">Prefer reading? Open the classic view</a>
+      </div>
+    </div>
+
     <div class="dpad" id="dpad" aria-hidden="true">
       <button type="button" data-dir="up" tabindex="-1">▲</button>
       <button type="button" data-dir="left" tabindex="-1">◀</button>
       <button type="button" data-dir="right" tabindex="-1">▶</button>
       <button type="button" data-dir="down" tabindex="-1">▼</button>
-      <button type="button" data-dir="jump" class="only-3d" tabindex="-1">JUMP</button>
+      <button type="button" data-dir="jump" class="only-3d" tabindex="-1">Jump</button>
     </div>
   </main>
 
   <footer class="term-status">
-    <span><kbd>WASD</kbd><kbd>↑↓←→</kbd> MOVE</span>
-    <span class="only-3d"><kbd>SHIFT</kbd> RUN</span>
-    <span class="only-3d"><kbd>SPACE</kbd> JUMP</span>
-    <span><kbd>ENTER</kbd> OPEN</span>
-    <span><kbd>1</kbd>–<kbd id="travel-max">8</kbd> TRAVEL</span>
-    <span class="hide-sm"><kbd>ESC</kbd> CLOSE</span>
-    <button type="button" class="status-btn" id="tour-btn"><kbd>T</kbd> GUIDED ROUTE</button>
-    <a href="?map=2d#map" class="status-btn" data-map-switch><kbd>M</kbd> 2D MAP</a>
-    <a href="#classic" class="status-btn hide-sm"><kbd>C</kbd> CLASSIC VIEW</a>
+    <span><kbd>WASD</kbd><kbd>↑↓←→</kbd> Walk</span>
+    <span class="only-3d"><kbd>Shift</kbd> Run</span>
+    <span class="only-3d"><kbd>Space</kbd> Jump</span>
+    <span><kbd>Enter</kbd> Open</span>
+    <span class="hide-sm"><kbd>1</kbd>-<kbd id="travel-max">8</kbd> Go to a section</span>
+    <span class="hide-sm"><kbd>Esc</kbd> Back</span>
+    <button type="button" class="status-btn" id="tour-btn"><kbd>T</kbd> Guided tour</button>
+    <a href="?map=2d#map" class="status-btn" data-map-switch><kbd>M</kbd> 2D map</a>
+    <a href="#classic" class="status-btn hide-sm"><kbd>C</kbd> Classic view</a>
+    <a href="#legal" class="status-link">Privacy &amp; terms</a>
   </footer>
 
   <!-- section window -->
@@ -85,13 +110,13 @@
     <section class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
       <header class="panel-head">
         <span class="panel-fkey" id="panel-fkey">F1</span>
-        <h2 id="panel-title">ABOUT ME</h2>
-        <button type="button" class="panel-close" id="panel-close" aria-label="Close section">ESC ✕</button>
+        <h2 id="panel-title">About Me</h2>
+        <button type="button" class="panel-close" id="panel-close" aria-label="Close section">Close ✕</button>
       </header>
       <div class="panel-body" id="panel-body"></div>
       <footer class="panel-foot">
-        <button type="button" class="t-btn" id="panel-prev">◀ PREV</button>
-        <button type="button" class="t-btn t-btn-amber" id="panel-next">NEXT ▶</button>
+        <button type="button" class="t-btn" id="panel-prev">← Previous</button>
+        <button type="button" class="t-btn t-btn-amber" id="panel-next">Next →</button>
       </footer>
     </section>
   </div>
@@ -103,15 +128,126 @@
 <section class="screen classic" id="screen-classic" aria-label="Classic view">
   <div class="classic-inner">
     <div class="classic-top">
-      <a href="#map" class="t-btn">◀ BACK TO THE MAP</a>
+      <a href="#map" class="t-btn">← Back to the city</a>
     </div>
     <div id="classic-body"></div>
   </div>
 </section>
 
-<script src="data.js?v=20261125a"></script>
+<!-- =============================================================
+     PRIVACY, TERMS, COOKIES, ACCESSIBILITY, CREDITS
+     ============================================================= -->
+<section class="screen legal" id="screen-legal" aria-label="Privacy, terms and accessibility">
+  <div class="legal-inner">
+    <div class="classic-top"><a href="#map" class="t-btn">← Back to the city</a> <a href="#classic" class="t-btn">Text version</a></div>
+    <h1>Privacy, terms &amp; accessibility</h1>
+    <p class="legal-date">Last updated: November 26, 2026</p>
+    <nav class="legal-nav" aria-label="On this page">
+      <a href="#legal/privacy">Privacy policy</a><a href="#legal/cookies">Cookies &amp; storage</a><a href="#legal/terms">Terms of use</a>
+      <a href="#legal/accessibility">Accessibility</a><a href="#legal/credits">Credits &amp; copyright</a><a href="#legal/other">Other notes</a>
+    </nav>
+
+    <section id="legal-about" class="legal-sec">
+      <h2>Who runs this site</h2>
+      <p>This is the personal portfolio of <b>Ludovic Lachance</b>, a Finance and Accounting student based in Ottawa, Ontario, Canada. It is not a business and nothing is sold here. For any question about this site or these policies, email <a href="mailto:llach097@uottawa.ca">llach097@uottawa.ca</a>.</p>
+    </section>
+
+    <section id="legal-privacy" class="legal-sec">
+      <h2>Privacy policy</h2>
+      <h3>What I collect</h3>
+      <p>Nothing. This site has no accounts, no sign-up or contact forms, no analytics, no ads and no tracking. I never see who visits.</p>
+      <h3>What your browser can remember (only if you say yes)</h3>
+      <p>If you choose <i>Remember</i> in the storage notice, your browser keeps two small notes on your own device: which sections you have explored, and that you have already seen the welcome card. They never leave your device and are never sent to me or anyone else. Your yes/no answer itself is also kept so the site doesn't ask again. Details and a delete button are under <a href="#legal/cookies">Cookies &amp; storage</a>.</p>
+      <h3>Hosting</h3>
+      <p>The site is hosted on GitHub Pages, run by GitHub, Inc. GitHub logs visitors' IP addresses for security purposes, whether or not they are signed in to GitHub. I don't receive those logs. See the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub Privacy Statement</a>.</p>
+      <h3>Fonts and code</h3>
+      <p>The fonts and the 3D library are served from this site itself, so loading the page doesn't contact any other company's servers.</p>
+      <h3>If you email me</h3>
+      <p>I receive your email address and whatever you write, and I use them only to reply. I don't add you to any mailing list and I don't share your message.</p>
+      <h3>Links to other sites</h3>
+      <p>Links to LinkedIn, GitHub, the Canadian Volleyball League and PDF files open other pages; those sites have their own privacy policies.</p>
+      <h3>Your rights</h3>
+      <p>Canada's privacy law (PIPEDA) and, for visitors from the EU or UK, the GDPR give you the right to ask what personal information I hold about you and to have it corrected or deleted. Since the site collects nothing, this would only ever concern an email you sent me. Just email me and I'll take care of it.</p>
+      <p>This site is not directed at children. If this policy changes, the date at the top will change too.</p>
+    </section>
+
+    <section id="legal-cookies" class="legal-sec">
+      <h2>Cookies &amp; storage</h2>
+      <p><b>This site uses no cookies.</b> With your permission it uses your browser's local storage, which stays on your device:</p>
+      <div class="legal-table" role="table" aria-label="What is stored">
+        <div role="row" class="lt-head"><span role="columnheader">Name</span><span role="columnheader">What it's for</span><span role="columnheader">How long</span></div>
+        <div role="row"><span role="cell"><code>ludo-go-v1</code></span><span role="cell">Which sections you've explored (for the progress dots)</span><span role="cell">Until you delete it</span></div>
+        <div role="row"><span role="cell"><code>ludo-welcome-v1</code></span><span role="cell">That you've already seen the welcome card</span><span role="cell">Until you delete it</span></div>
+        <div role="row"><span role="cell"><code>ludo-storage-choice</code></span><span role="cell">Your answer to the storage notice, so it isn't shown again</span><span role="cell">Until you delete it</span></div>
+      </div>
+      <p class="storage-status" id="storage-status"></p>
+      <div class="btn-row">
+        <button type="button" class="t-btn t-btn-amber" data-storage="yes">Remember my progress</button>
+        <button type="button" class="t-btn" data-storage="no">Don't remember anything</button>
+        <button type="button" class="t-btn" data-storage="clear">Delete saved data now</button>
+      </div>
+    </section>
+
+    <section id="legal-terms" class="legal-sec">
+      <h2>Terms of use</h2>
+      <h3>Not investment advice</h3>
+      <p>The stock pitches on this site are student work, prepared with teammates in the Telfer Finance Society Investment Group (TFSIG) for learning and practice. They are not investment advice, a recommendation, or an offer to buy or sell any security. Ratings such as "Buy", price targets and figures reflect the date of each pitch and may now be outdated or wrong. I am not a registered investment adviser. Do your own research or speak with a licensed professional before investing.</p>
+      <h3>Affiliations and trademarks</h3>
+      <p>Schools, employers, clubs and competitions named on this site are mentioned to describe my experience; they don't sponsor or endorse this site, and the views here are my own. Company names and logos, such as Linde and Duke Energy, belong to their owners and are used only to identify the companies discussed.</p>
+      <h3>Using the content</h3>
+      <p>Unless noted otherwise, the content of this site, including text, photos, pitch decks and the 3D city, is © 2026 Ludovic Lachance. You're welcome to view it and share links to it, but please don't copy or republish it without asking first.</p>
+      <h3>No guarantees</h3>
+      <p>I try to keep everything accurate and current, but the site is provided as is, without warranties. I'm not responsible for the content of other sites linked from here. These terms are governed by the laws of Ontario and of Canada.</p>
+    </section>
+
+    <section id="legal-accessibility" class="legal-sec">
+      <h2>Accessibility</h2>
+      <p>I want everyone to be able to read this portfolio, and I aim to meet the Web Content Accessibility Guidelines (WCAG) 2.1, level AA.</p>
+      <ul>
+        <li>A <a href="#classic">text version</a> has every section on one plain page and works with screen readers. A "skip to the text version" link is the first thing you reach with the keyboard.</li>
+        <li>Everything works with the keyboard: arrow keys or W A S D to walk, Enter to open, Esc to go back, Tab to move between buttons, and 1 to 8 to jump to a section.</li>
+        <li>Text is white on dark green for strong contrast; photos have descriptions (alt text); buttons have clear labels.</li>
+        <li>Animations in the interface are turned off if your device is set to reduce motion.</li>
+      </ul>
+      <p>The 3D city itself is visual and can't be fully described to a screen reader, which is why the text version has all the same content. If something doesn't work for you, please email <a href="mailto:llach097@uottawa.ca">llach097@uottawa.ca</a> and I'll fix it.</p>
+    </section>
+
+    <section id="legal-credits" class="legal-sec">
+      <h2>Credits &amp; copyright</h2>
+      <ul>
+        <li><b>Photos:</b> my profile photo and a photo from the TCU x uOREC 2026 case competition. If you appear in a photo on this site and would like it removed, email me and I'll take it down.</li>
+        <li><b>3D library:</b> <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a>, MIT License, © three.js authors (license included with the site).</li>
+        <li><b>Fonts:</b> DM Sans, Sora and JetBrains Mono, under the SIL Open Font License 1.1 (licenses included with the site).</li>
+        <li><b>Everything else</b>, including the city, the characters and the illustrations, was made for this site.</li>
+      </ul>
+    </section>
+
+    <section id="legal-other" class="legal-sec">
+      <h2>Other notes</h2>
+      <ul>
+        <li><b>Refunds:</b> nothing is sold on this site, so there is no refund policy.</li>
+        <li><b>Reviews:</b> this site shows no reviews or testimonials.</li>
+        <li><b>Forms:</b> there are no forms; the email link opens your own email app.</li>
+        <li><b>Analytics and embeds:</b> there is no analytics or tracking, and no embedded videos, maps or social-media widgets.</li>
+        <li><b>Results and claims:</b> placements, prizes, dates and roles are listed as they happened. If you spot something wrong, email me.</li>
+        <li><b>Email:</b> I don't send newsletters or marketing emails, so Canada's Anti-Spam Legislation (CASL) doesn't come into play here.</li>
+      </ul>
+    </section>
+  </div>
+</section>
+
+<!-- storage notice (shown once) -->
+<div class="consent" id="consent" role="region" aria-label="Storage notice" hidden>
+  <p><b>No cookies, no tracking.</b> Can this site remember which sections you've explored? It's saved only in your browser, on this device. <a href="#legal/cookies">Learn more</a></p>
+  <div class="consent-actions">
+    <button type="button" class="t-btn t-btn-amber" data-storage="yes">Remember</button>
+    <button type="button" class="t-btn" data-storage="no">No thanks</button>
+  </div>
+</div>
+
+<script src="data.js?v=20261126b"></script>
 <script src="lib/three.min.js"></script>
-<script src="map3d.js?v=20261125a"></script>
-<script src="script.js?v=20261125a"></script>
+<script src="map3d.js?v=20261126b"></script>
+<script src="script.js?v=20261126b"></script>
 </body>
 </html>

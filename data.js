@@ -1,5 +1,5 @@
 /* =====================================================================
-   LUDO <GO> — YOUR CONTENT
+   LUDO <GO> - YOUR CONTENT
    ---------------------------------------------------------------------
    This is the only file you need to edit to change what the site says.
    Replace anything in [brackets] with your real information, keep the
@@ -85,10 +85,10 @@ window.PORTFOLIO = {
       intro: "",
       // text: a blank line ("\n\n") starts a new paragraph · image: optional photo, e.g. "files/photo.jpg"
       items: [
-        { title: "Grime to Green — Car Detailing", org: "Founder · Ottawa, ON", date: "May 2024 – Aug 2025", result: "",
+        { title: "Grime to Green - Car Detailing", org: "Founder · Ottawa, ON", date: "May 2024 - Aug 2025", result: "",
           text: "Grime to Green was an Ottawa-based car detailing business offering detailing services tailored to each client’s needs. In just over a year, it grew into a profitable operation, generating more than $15,000 in revenue while maintaining operating margins above 75%.\n\nThe business served over 100 clients and built a steady stream of repeat business and referrals by consistently delivering spotless results. Running it meant hiring and managing a team of three employees, overseeing scheduling and quality control, and tracking revenue, expenses and profitability to guide its growth.",
           bullets: [], skills: ["Financial Planning", "Team Management", "Operations Management", "Client Service"], link: "" },
-        { title: "Canadian Volleyball League (CVL)", org: "Director of Finance · Ottawa, ON", date: "Jun 2026 – Present", result: "",
+        { title: "Canadian Volleyball League (CVL)", org: "Director of Finance · Ottawa, ON", date: "Jun 2026 - Present", result: "",
           text: "The Canadian Volleyball League is an Ottawa-based volleyball organization. We currently run competitive coed and men’s tournaments, such as the Summer Coed Cup and the Winter Coed Championship, that bring athletes, fans and supporters together, and we’re looking to expand into a full league in the long run.\n\nAs Director of Finance, I help plan event budgets and logistics, using Excel to track expenses and find ways to cut costs. I also helped organize a summer tournament that generated up to $6,600 in sales.",
           bullets: [], skills: ["Budgeting", "Event Planning", "Cost Optimization"], link: "https://www.canadavolleyballleague.ca/", linkLabel: "Visit website" }
       ]
@@ -99,37 +99,37 @@ window.PORTFOLIO = {
       id: "experience", type: "entries", fkey: "F5", code: "EXP", label: "Professional Experience", blurb: "Where I've worked",
       intro: "",
       items: [
-        { title: "Store Sales Associate", org: "Running Room · Part-time · Ottawa, ON", date: "Aug 2026 – Present", result: "", text: "",
+        { title: "Store Sales Associate", org: "Running Room · Part-time · Ottawa, ON", date: "Aug 2026 - Present", result: "", text: "",
           bullets: [
             "Advising customers on product options and pricing, strengthening client communication and need-based sales skills",
             "Processing transactions accurately and supporting inventory and merchandising activities in a fast-paced retail environment"
           ],
           skills: ["Client Relationships", "Needs-Based Selling", "Attention to Detail", "Inventory Management"], link: "" },
-        { title: "Coach", org: "CrossFit Actus · Part-time · Ottawa, ON", date: "May 2026 – Oct 2026", result: "", text: "",
+        { title: "Coach", org: "CrossFit Actus · Part-time · Ottawa, ON", date: "May 2026 - Oct 2026", result: "", text: "",
           bullets: [
-            "Assisted in running CrossFit classes of 1–10 people, demonstrating movements, correcting form and keeping each session on schedule",
+            "Assisted in running CrossFit classes of 1-10 people, demonstrating movements, correcting form and keeping each session on schedule",
             "Adapted workouts to each member’s fitness level and goals, creating a safe, motivating environment that kept members engaged and coming back"
           ],
           skills: ["Coaching & Mentoring", "Public Speaking", "Client Relationships", "Adaptability"], link: "" },
-        { title: "Camp Area Supervisor", org: "YMCA Canada · Full-time summer contract · Ottawa, ON", date: "Jun 2026 – Aug 2026", result: "", text: "",
+        { title: "Camp Area Supervisor", org: "YMCA Canada · Full-time summer contract · Ottawa, ON", date: "Jun 2026 - Aug 2026", result: "", text: "",
           bullets: [
             "Supervised and supported a team of camp counselors, overseeing daily programming, scheduling and safety across an assigned camp area",
             "Served as a key point of contact for parents and staff, resolving issues quickly to ensure a safe, positive experience for every camper"
           ],
           skills: ["Team Leadership", "Problem Solving", "Planning & Scheduling", "Decision-Making"], link: "" },
-        { title: "Camp Counselor", org: "YMCA Canada · Full-time summer contracts · Ottawa, ON", date: "Jun 2024 – Aug 2024 · Jun 2025 – Aug 2025", result: "", text: "",
+        { title: "Camp Counselor", org: "YMCA Canada · Full-time summer contracts · Ottawa, ON", date: "Jun 2024 - Aug 2024 · Jun 2025 - Aug 2025", result: "", text: "",
           bullets: [
             "Led daily activities for groups of campers over two summer terms, delivering engaging programs that built teamwork, confidence and inclusion",
             "Ensured camper safety and well-being at all times, communicating regularly with parents and collaborating closely with fellow counselors"
           ],
           skills: ["Communication", "Teamwork", "Accountability", "Adaptability"], link: "" },
-        { title: "Line Cook", org: "McDonald’s · Part-time · Ottawa, ON", date: "Jan 2025 – May 2025", result: "", text: "",
+        { title: "Line Cook", org: "McDonald’s · Part-time · Ottawa, ON", date: "Jan 2025 - May 2025", result: "", text: "",
           bullets: [
             "Prepared orders quickly and accurately in a high-volume kitchen, maintaining strict food safety and quality standards during peak hours",
             "Collaborated with a fast-paced team to keep service times low, adapting to shifting priorities while keeping a clean, organized station"
           ],
           skills: ["Working Under Pressure", "Time Management", "Process Efficiency", "Collaboration"], link: "" },
-        { title: "Store Clerk", org: "Bulk Barn · Part-time · Ottawa, ON", date: "May 2023 – Oct 2023", result: "", text: "",
+        { title: "Store Clerk", org: "Bulk Barn · Part-time · Ottawa, ON", date: "May 2023 - Oct 2023", result: "", text: "",
           bullets: [
             "Restocked shelves and bulk bins and kept the store clean and organized, ensuring a smooth and pleasant shopping experience for customers",
             "Assisted customers in finding products and answering their questions, building strong customer service, communication and time-management skills"
@@ -145,26 +145,26 @@ window.PORTFOLIO = {
       items: [
         { title: "Entrepreneurship Coach", org: "Place à la jeunesse", date: "Nov 2026", result: "", text: "",
           bullets: [
-            "Coached teams of 2–4 high school students through an entrepreneurship competition, guiding them as they developed their business ideas and stepping in whenever they needed help"
+            "Coached teams of 2-4 high school students through an entrepreneurship competition, guiding them as they developed their business ideas and stepping in whenever they needed help"
           ], skills: ["Mentoring", "Coaching", "Communication", "Entrepreneurship"], link: "" },
-        { title: "Director of Academia", org: "University of Ottawa Consulting Association (UOCA)", date: "May 2026 – Present", result: "", text: "",
+        { title: "Director of Academia", org: "University of Ottawa Consulting Association (UOCA)", date: "May 2026 - Present", result: "", text: "",
           bullets: [
             "Led the development of consulting-focused workshops and educational resources to strengthen members' problem-solving and analytical skills",
             "Coordinated with executives, industry professionals, and student leaders to deliver academic programming focused on consulting frameworks, case competitions, and career readiness",
             "Managed the club’s academic strategy and training initiatives, ensuring members had structured opportunities to develop presentation, research, and business analysis skills"
           ], skills: ["Leadership", "Program Development", "Stakeholder Coordination", "Public Speaking"], link: "" },
-        { title: "Junior Analyst", org: "TFS Investment Group", date: "Sep 2025 – Present", result: "", text: "",
+        { title: "Junior Analyst", org: "TFS Investment Group", date: "Sep 2025 - Present", result: "", text: "",
           bullets: [
             "Conducted financial analysis and equity research on publicly traded companies, building valuation models and presenting investment recommendations to portfolio managers for Duke Energy (NYSE:DUK) and Linde PLC (NASDAQ:LIN)",
             "Collaborated with analysts and portfolio managers to monitor portfolio performance, analyze market trends, and evaluate investment opportunities for Tourmaline (TSE:TOU) and Ivanhoe (TSE:IVN)",
             "Applied financial modelling techniques including comparables company analysis, relative valuation, and three-statement modelling"
           ], skills: ["Equity Research", "Financial Modelling", "Valuation", "Market Analysis"], link: "" },
-        { title: "External Relations Coordinator", org: "Enactus uOttawa", date: "May 2025 – Apr 2026", result: "", text: "",
+        { title: "External Relations Coordinator", org: "Enactus uOttawa", date: "May 2025 - Apr 2026", result: "", text: "",
           bullets: [
             "Prepared and submitted grant applications to secure funding for Enactus uOttawa’s social entrepreneurship projects, tailoring each proposal to the funder’s criteria",
             "Built relationships with corporate partners, sponsors and community organizations, coordinating outreach to strengthen the team’s funding and visibility"
           ], skills: ["Grant Writing", "Partnership Development", "Outreach", "Written Communication"], link: "" },
-        { title: "First Year Representative", org: "CPA Ontario: University of Ottawa", date: "Sep 2025 – Dec 2025", result: "", text: "",
+        { title: "First Year Representative", org: "CPA Ontario: University of Ottawa", date: "Sep 2025 - Dec 2025", result: "", text: "",
           bullets: [
             "Increased student engagement by promoting professional-development, networking, and CPA-focused events across campus",
             "Collaborated with CPA Ontario representatives and campus leaders to strengthen awareness of the CPA designation and accounting career pathways"
@@ -212,7 +212,7 @@ window.PORTFOLIO = {
       jurisdiction: "Global (Americas · EMEA · APAC)",
       call: "Buy", target: "$520.56", date: "February 23, 2026",
       team: "TFSIG Natural Resources Coverage Group · team of 4", role: "Junior Analyst",
-      thesis: "Linde is one of the three global leaders in industrial gases, with a defensive business model built on 15–20 year take-or-pay contracts and cost pass-through agreements that protect margins through commodity cycles. Over 62% of sales are defensive, and a $10B project backlog plus structural demand from semiconductors, AI infrastructure and healthcare support steady, above-peer earnings growth.",
+      thesis: "Linde is one of the three global leaders in industrial gases, with a defensive business model built on 15-20 year take-or-pay contracts and cost pass-through agreements that protect margins through commodity cycles. Over 62% of sales are defensive, and a $10B project backlog plus structural demand from semiconductors, AI infrastructure and healthcare support steady, above-peer earnings growth.",
       metrics: [
         { label: "Price at pitch", value: "$496.51" }, { label: "Upside", value: "4.85%" },
         { label: "Market cap", value: "$233.9B" }, { label: "Dividend yield", value: "1.24%" },
@@ -220,14 +220,14 @@ window.PORTFOLIO = {
         { label: "P/E 2026E", value: "21.3x" }, { label: "WACC", value: "6.75%" }
       ],
       points: [
-        "Thesis I — Demographic tailwinds: a growing, ageing population drives long-term demand for medical oxygen, food preservation and cold-chain gases.",
-        "Thesis II — Defensive growth: long-term take-or-pay contracts, cost pass-throughs and an oligopolistic market (top players hold ~80% share) give Linde pricing power and protected margins.",
-        "Thesis III — Structural demand from AI adoption (semiconductor fabs, data-centre cooling) and health-conscious consumer trends.",
-        "Valuation — blended DCF (TGR 25%, exit multiple 60%) and comparables (15%), giving a $520.56 target.",
-        "Key risks — capital-intensive project overruns, hydrogen competition and U.S. tariffs, mitigated by long-term contracts and a diversified global footprint."
+        "Thesis I - Demographic tailwinds: a growing, ageing population drives long-term demand for medical oxygen, food preservation and cold-chain gases.",
+        "Thesis II - Defensive growth: long-term take-or-pay contracts, cost pass-throughs and an oligopolistic market (top players hold ~80% share) give Linde pricing power and protected margins.",
+        "Thesis III - Structural demand from AI adoption (semiconductor fabs, data-centre cooling) and health-conscious consumer trends.",
+        "Valuation - blended DCF (TGR 25%, exit multiple 60%) and comparables (15%), giving a $520.56 target.",
+        "Key risks - capital-intensive project overruns, hydrogen competition and U.S. tariffs, mitigated by long-term contracts and a diversified global footprint."
       ],
       catalysts: [
-        { date: "2026", text: "Adjusted EPS guidance of $17.40–$17.90, roughly 6–9% growth year over year" },
+        { date: "2026", text: "Adjusted EPS guidance of $17.40-$17.90, roughly 6-9% growth year over year" },
         { date: "Ongoing", text: "Conversion of the $10B project backlog into contracted revenue" },
         { date: "Ongoing", text: "AI-driven semiconductor fab construction lifting demand for high-purity gases" }
       ],
@@ -238,7 +238,7 @@ window.PORTFOLIO = {
       jurisdiction: "U.S. Southeast & Midwest",
       call: "Buy", target: "$129.88", date: "December 1, 2025",
       team: "TFSIG Natural Resources Coverage Group · team of 6", role: "First Year Analyst",
-      thesis: "Duke Energy is a regulated U.S. utility headquartered in Charlotte, with 55,139 MW of generating capacity across the Southeast and Midwest. Its industry-leading $95–105B 2026–2030 capex plan turns regulator-mandated infrastructure spending into a growing rate base, supporting a reaffirmed 5–7% long-term EPS growth rate, while data centres, reshoring and population migration accelerate load growth.",
+      thesis: "Duke Energy is a regulated U.S. utility headquartered in Charlotte, with 55,139 MW of generating capacity across the Southeast and Midwest. Its industry-leading $95-105B 2026-2030 capex plan turns regulator-mandated infrastructure spending into a growing rate base, supporting a reaffirmed 5-7% long-term EPS growth rate, while data centres, reshoring and population migration accelerate load growth.",
       metrics: [
         { label: "Price at pitch", value: "$122.80" }, { label: "Total return", value: "5.76%" },
         { label: "Market cap", value: "$96.3B" }, { label: "Dividend yield", value: "3.4%" },
@@ -246,10 +246,10 @@ window.PORTFOLIO = {
         { label: "P/E 2025E", value: "20.10x" }, { label: "WACC", value: "5.02%" }
       ],
       points: [
-        "Thesis I — Industry-leading capex plan: $95–105B over 2026–2030, the largest among U.S. utilities, mostly regulator-mandated projects with high cost-recovery visibility; Q3 EPS rose 11%.",
-        "Thesis II — Clean energy transition and accelerating load growth: 5 GW of new natural gas by 2029, 1,500 MW of new solar per year in the Carolinas from 2027, and licence renewals for all 11 nuclear units.",
-        "Valuation — DCF exit multiple (5- and 10-year, 20% each) and comparables (60%), giving a $129.88 target.",
-        "Key risks — fuel and nuclear costs, new EPA rules and reliance on state approvals, mitigated by decoupling, integrated resource planning and cost-recovery mechanisms."
+        "Thesis I - Industry-leading capex plan: $95-105B over 2026-2030, the largest among U.S. utilities, mostly regulator-mandated projects with high cost-recovery visibility; Q3 EPS rose 11%.",
+        "Thesis II - Clean energy transition and accelerating load growth: 5 GW of new natural gas by 2029, 1,500 MW of new solar per year in the Carolinas from 2027, and licence renewals for all 11 nuclear units.",
+        "Valuation - DCF exit multiple (5- and 10-year, 20% each) and comparables (60%), giving a $129.88 target.",
+        "Key risks - fuel and nuclear costs, new EPA rules and reliance on state approvals, mitigated by decoupling, integrated resource planning and cost-recovery mechanisms."
       ],
       catalysts: [
         { date: "Near term", text: "Approved rate cases: $768M Carolinas increase at a 10% ROE and $385M of incremental Indiana revenue at a 9.75% ROE" },

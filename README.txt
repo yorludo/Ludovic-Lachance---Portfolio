@@ -1,4 +1,4 @@
-LUDOVIC LACHANCE - PORTFOLIO — website
+LUDOVIC LACHANCE - PORTFOLIO - website
 ======================================
 
 WHAT'S IN THIS FOLDER
@@ -8,6 +8,7 @@ WHAT'S IN THIS FOLDER
   script.js    The game logic (routes, section windows, the 2D map)
   map3d.js     The 3D city (statue, towers, lobbies and billboards, the banker)
   lib\         three.min.js, the free 3D library the map uses (don't edit)
+  fonts\       The site's fonts (DM Sans, Sora, JetBrains Mono), served from here
   data.js      ALL YOUR CONTENT  <-- this is the file you edit
   files\       Put your PDFs here (resume + pitch PDFs)
 
@@ -43,9 +44,10 @@ Outside
   Shift (hold)              run
   Space                     jump
   Enter (or E)              go inside the tower you're standing at
-  1 – 8                     walk the route to that tower and go inside
-  T                         guided route: walks to tower 1, then use
-                            "NEXT" in each window to walk to the next one
+  1 - 8                     walk the route to that tower and go inside
+  T                         guided tour: fully automatic. Walks into each tower,
+                            visits every billboard in order, then moves on.
+                            N = next billboard, Esc or any walking key = stop
   C                         classic view (everything on one plain page)
   M                         switch between the 3D city and the original 2D map
   Click a tower to walk there and go in; click the ground to walk to that spot.
@@ -59,6 +61,15 @@ Inside a tower
 On phones: tap a tower or a billboard and the banker walks there; there's an
 on-screen arrow pad with a JUMP button. Towers between the camera and the
 banker turn see-through so he's never hidden.
+
+PRIVACY, TERMS & ACCESSIBILITY
+The page at  #legal  (linked bottom right, on the start screen and in the
+classic view) holds the privacy policy, cookies & storage, terms of use,
+accessibility statement and credits. Nothing is saved in a visitor's browser
+unless they click "Remember" in the storage notice. If you add a new kind of
+data, photo, embed or tracking tool, update that page (it's in index.html)
+and its "Last updated" date.
+
 
 THE ORIGINAL 2D MAP
 The first version of the map is still there. Get to it with the "M 2D MAP"

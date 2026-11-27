@@ -1,5 +1,5 @@
 /* =====================================================================
-   LUDOVIC LACHANCE - PORTFOLIO — behaviour
+   LUDOVIC LACHANCE - PORTFOLIO - behaviour
    You normally don't need to edit this file: content lives in data.js.
    ===================================================================== */
 (function () {
@@ -139,13 +139,21 @@
     return pts.join(" ");
   }
 
+  /* ---------- browser storage: only with the visitor's permission ---------- */
+  var CHOICE_KEY = "ludo-storage-choice";   // "yes" or "no"
+  function storageChoice() { try { return localStorage.getItem(CHOICE_KEY); } catch (e) { return null; } }
+  function canStore() { return storageChoice() === "yes"; }
+  function store(key, val) { if (!canStore()) return; try { localStorage.setItem(key, val); } catch (e) { /* ignore */ } }
+  function read(key) { if (!canStore()) return null; try { return localStorage.getItem(key); } catch (e) { return null; } }
+
   /* ---------- saved progress ---------- */
   var visited = {};
-  try { visited = JSON.parse(localStorage.getItem(STORE_KEY) || "{}").visited || {}; } catch (e) { visited = {}; }
+  try { visited = JSON.parse(read(STORE_KEY) || "{}").visited || {}; } catch (e) { visited = {}; }
+  function saveVisited() { store(STORE_KEY, JSON.stringify({ visited: visited })); }
   function markVisited(id) {
     if (visited[id]) return;
     visited[id] = true;
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ visited: visited })); } catch (e) { /* ignore */ }
+    saveVisited();
     refreshVisited();
   }
   function visitedCount() { var n = 0; P.sections.forEach(function (s) { if (visited[s.id]) n++; }); return n; }
@@ -169,7 +177,7 @@
      #s/<id>      the map with a section open   (#s/pitches/<pitchId> for one pitch)
      #classic     one plain page
      ===================================================================== */
-  var screens = { boot: $("#screen-boot"), map: $("#screen-map"), classic: $("#screen-classic") };
+  var screens = { boot: $("#screen-boot"), map: $("#screen-map"), classic: $("#screen-classic"), legal: $("#screen-legal") };
   var currentScreen = null;
   var openId = null;
 
@@ -184,10 +192,10 @@
     var brand = $(".term-brand"), block = $("#brand-name"), go = $(".brand-go");
     function paint() {
       if (sec) {
-        block.innerHTML = '<span class="brand-fkey">' + esc(sec.fkey || "F" + (idx + 1)) + "</span>" + esc(sec.label.toUpperCase());
+        block.innerHTML = '<span class="brand-fkey">' + esc(sec.fkey || "F" + (idx + 1)) + "</span><strong>" + esc(sec.label) + "</strong>";
         go.textContent = ""; go.hidden = true;
       } else {
-        block.textContent = SITE_TITLE.toUpperCase();
+        block.innerHTML = "<strong>" + esc(P.name) + '</strong><span class="brand-sub">- Portfolio</span>';
         go.textContent = ""; go.hidden = true;
       }
       brand.classList.remove("swap");
@@ -202,6 +210,7 @@
     if (name === "map") {
       if (use3D) window.Map3D.start();
       else { resize(); snapCamera(); startLoop(); }
+      setTimeout(showWelcome, 600);
     } else {
       if (use3D) window.Map3D.stop();
       else stopLoop();
@@ -220,6 +229,13 @@
       return;
     }
     if (parts[0] === "classic") { closePanel(); showScreen("classic"); return; }
+    if (parts[0] === "legal") {
+      closePanel(); showScreen("legal");
+      var target = parts[1] && document.getElementById("legal-" + parts[1]);
+      screens.legal.scrollTop = target ? target.offsetTop - 16 : 0;
+      refreshStorageStatus();
+      return;
+    }
     closePanel();
     showScreen("boot");
   }
@@ -233,18 +249,17 @@
     if (booted) return;
     booted = true;
     var lines = [
-      "> CONNECTING TO " + SITE_TITLE.toUpperCase() + " ...",
-      "> LOADING PROFILE ............ OK",
-      "> LOADING " + P.pitches.length + " PITCHES ............ OK",
-      "> MAPPING " + N + " SECTIONS ........... OK",
-      "> READY. WALK THE ROUTE OR PRESS 1–" + N + " TO TRAVEL."
+      "Hi, I'm " + (P.shortName || P.name.split(" ")[0]) + ".",
+      "Welcome to my portfolio: a small city where each tower tells part of my story.",
+      "Building the " + N + " towers and setting out my " + P.pitches.length + " stock pitches…",
+      "All set. Come on in!"
     ];
     var log = $("#boot-log"), i = 0;
     log.textContent = "";
     (function next() {
       if (i >= lines.length) return;
       log.textContent += (i ? "\n" : "") + lines[i++];
-      setTimeout(next, 260);
+      setTimeout(next, 420);
     })();
   }
 
@@ -295,31 +310,36 @@
 
   function buildChrome() {
     setHeader(null);
-    $("#boot-name").textContent = P.name.toUpperCase() + " -\u2060\u00a0PORTFOLIO";   // wraps as "NAME" / "- PORTFOLIO" on phones
-    $("#banker-tag").textContent = (P.shortName || P.name.split(" ")[0]).toUpperCase();
+    $("#boot-name").textContent = P.name + " -\u2060\u00a0Portfolio";   // wraps as "Name" / "- Portfolio" on phones
+    $("#banker-tag").textContent = P.shortName || P.name.split(" ")[0];
+    $("#welcome-photo").src = P.photo || "";
+    $("#brand-avatar").src = P.photo || "";
+    $("#welcome-photo").alt = "Photo of " + P.name;
+    if (!use3D) $("#welcome-text").textContent = "Welcome to my portfolio! Each window on this map holds a part of my story: my pitches, case competitions, ventures, experience and more. Walk up to one and open it to explore.";
+    $("#progress-dots").innerHTML = P.sections.map(function () { return "<i></i>"; }).join("");
 
-    // ticker tape: built only from your own content
-    var items = [];
-    P.sections.forEach(function (s, i) { items.push("<span><b>" + (i + 1) + "</b> " + esc(s.label.toUpperCase()) + "</span>"); });
-    P.pitches.forEach(function (p) {
-      var cc = callClass(p.call);
-      items.push("<span><b>" + esc(p.ticker) + "</b> " + esc(p.company) + ' <span class="' + (cc === "call-buy" ? "up" : cc === "call-sell" ? "down" : "") + '">' + esc(p.call) + "</span></span>");
-    });
-    items.push("<span>WALK WITH <b>WASD</b> OR <b>ARROWS</b> · <b>ENTER</b> TO OPEN · <b>T</b> FOR THE GUIDED ROUTE</span>");
-    var one = items.join("");
-    $("#tape-track").innerHTML = one + one;
+    // section shortcuts under the header: click one to walk there
+    $("#tape-track").innerHTML = P.sections.map(function (s, i) {
+      return '<button type="button" class="nav-chip" data-go="' + i + '"><b>' + (i + 1) + "</b>" + esc(s.label) + "</button>";
+    }).join("");
     $("#travel-max").textContent = N;
     mapEl.setAttribute("aria-label", "Map. Use W A S D or the arrow keys to walk, Enter to open a section, 1 to " + N + " to travel.");
   }
 
   function refreshVisited() {
     $("#visited-count").textContent = visitedCount() + "/" + N;
+    var dots = document.querySelectorAll("#progress-dots i");
+    P.sections.forEach(function (s, i) {
+      if (dots[i]) dots[i].classList.toggle("on", !!visited[s.id]);
+      var chip = document.querySelector('.nav-chip[data-go="' + i + '"]');
+      if (chip) chip.classList.toggle("visited", !!visited[s.id]);
+    });
     if (use3D) window.Map3D.refreshScreens();
     Array.prototype.forEach.call(document.querySelectorAll(".node"), function (el) {
       var s = P.sections[+el.getAttribute("data-i")];
       var v = !!visited[s.id];
       el.classList.toggle("visited", v);
-      el.querySelector(".node-status").textContent = v ? "✓ VIEWED" : "● NEW";
+      el.querySelector(".node-status").textContent = v ? "✓ Explored" : "● New";
     });
   }
 
@@ -495,14 +515,14 @@
     if (near) {
       var el = document.querySelector('.node[data-i="' + near.i + '"]');
       if (el) el.classList.add("active");
-      pr.innerHTML = text ? promptHtml(text) : "▶ " + esc(near.sec.label.toUpperCase()) + " &nbsp;—&nbsp; PRESS <kbd>ENTER</kbd>" + (use3D ? " OR CLICK THE SIGN" : "");
+      pr.innerHTML = text ? promptHtml(text) : "Press <kbd>Enter</kbd> to open " + esc(near.sec.label);
       pr.hidden = false;
     } else if (text) { pr.innerHTML = promptHtml(text); pr.hidden = false; }
     else pr.hidden = true;
   }
   // the 3D city sends plain text; key names become key caps
   function promptHtml(t) {
-    return esc(t).replace(/\b(ENTER|ESC)\b/g, "<kbd>$1</kbd>").replace(/ — /g, " &nbsp;—&nbsp; ");
+    return esc(t).replace(/\b(Enter|Esc|N)\b/g, "<kbd>$1</kbd>").replace(/ - /g, " &nbsp;-&nbsp; ");
   }
   // Enter / click on the prompt: in the 3D city a door takes you inside; a billboard opens its details
   function activate() {
@@ -525,6 +545,11 @@
     if (currentScreen === "boot" && e.code === "KeyC") { location.hash = "classic"; return; }
     if (currentScreen !== "map") return;
 
+    if (!$("#welcome").hidden) {
+      if (e.key === "Escape" || e.key === "Enter") { e.preventDefault(); closeWelcome(); }
+      else if (e.code === "KeyT") { e.preventDefault(); startTour(); }
+      return;
+    }
     var panelOpen = !$("#panel").hidden;
     if (panelOpen) {
       if (e.key === "Escape") { e.preventDefault(); location.hash = "map"; }
@@ -574,8 +599,69 @@
   });
 
   // guided route: walk to section 1, then "Next" carries on around the ring
-  function startTour() { travelTo(0, true); }
+  function startTour() {
+    closeWelcome();
+    if (!$("#panel").hidden) location.hash = "map";
+    if (use3D) window.Map3D.startTour(); else travelTo(0, true);
+  }
   $("#tour-btn").addEventListener("click", startTour);
+  $("#tape-track").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-go]"); if (!b) return;
+    closeWelcome();
+    if (!$("#panel").hidden) location.hash = "map";
+    travelTo(+b.getAttribute("data-go"), true);
+  });
+
+  // highlight the section you're in (inside its tower, or its window is open)
+  function markCurrent(k) {
+    Array.prototype.forEach.call(document.querySelectorAll(".nav-chip"), function (c) { c.classList.toggle("current", +c.getAttribute("data-go") === k); });
+  }
+
+  /* ---------- storage notice ---------- */
+  function refreshStorageStatus() {
+    var c = storageChoice(), el = $("#storage-status");
+    if (el) el.textContent = c === "yes" ? "Right now: your progress is remembered on this device." :
+      c === "no" ? "Right now: nothing is remembered (only your \"no\" answer is kept, so you aren't asked again)." :
+      "Right now: nothing is stored. You haven't chosen yet.";
+  }
+  function setStorage(choice) {
+    try {
+      if (choice === "clear") {
+        [STORE_KEY, WELCOME_KEY, CHOICE_KEY].forEach(function (k) { localStorage.removeItem(k); });
+        Object.keys(visited).forEach(function (k) { delete visited[k]; }); refreshVisited();
+      } else {
+        localStorage.setItem(CHOICE_KEY, choice);
+        if (choice === "yes") { saveVisited(); if (welcomeDone) store(WELCOME_KEY, "1"); }
+        else { localStorage.removeItem(STORE_KEY); localStorage.removeItem(WELCOME_KEY); }
+      }
+    } catch (e) { /* storage blocked by the browser: nothing to do */ }
+    $("#consent").hidden = true;
+    refreshStorageStatus();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-storage]"), function (b) {
+    b.addEventListener("click", function () { setStorage(b.getAttribute("data-storage")); });
+  });
+  if (!storageChoice()) $("#consent").hidden = false;
+
+  /* ---------- first-visit welcome card ---------- */
+  var WELCOME_KEY = "ludo-welcome-v1";
+  var welcomeDone = false;   // remembered for this visit even when nothing is stored
+  function welcomeSeen() { return welcomeDone || read(WELCOME_KEY) === "1"; }
+  function showWelcome() {
+    if (welcomeSeen() || !$("#panel").hidden) return;
+    $("#welcome").hidden = false;
+    if (use3D) window.Map3D.setPaused(true);
+    setTimeout(function () { $("#welcome-explore").focus(); }, 50);
+  }
+  function closeWelcome() {
+    if ($("#welcome").hidden) return;
+    $("#welcome").hidden = true;
+    welcomeDone = true; store(WELCOME_KEY, "1");
+    if (use3D && $("#panel").hidden) window.Map3D.setPaused(false);
+    mapEl.focus();
+  }
+  $("#welcome-explore").addEventListener("click", closeWelcome);
+  $("#welcome-tour").addEventListener("click", startTour);
 
   /* =====================================================================
      SECTION WINDOW
@@ -599,10 +685,13 @@
     markVisited(id);
     var s = n.sec;
     setHeader(s, i);
+    markCurrent(i);
     $("#panel-fkey").textContent = s.fkey || "F" + (i + 1);
     $("#panel-title").textContent = s.label;
     $("#panel-body").innerHTML = renderSection(s, pitchId, false);
     $("#panel-body").scrollTop = 0;
+    var wasHidden = panel.hidden;
+    panel.hidden = false;   // shown before measuring, so the scroll below works
     // opened from a billboard? scroll to that entry
     if (pendingEntry != null && !pitchId) {
       var boxes = $("#panel-body").querySelectorAll(".box");
@@ -610,10 +699,8 @@
     }
     pendingEntry = null;
     var prev = nodes[(i - 1 + N) % N].sec, next = nodes[(i + 1) % N].sec;
-    $("#panel-prev").textContent = "◀ " + prev.label.toUpperCase();
-    $("#panel-next").textContent = "NEXT: " + next.label.toUpperCase() + " ▶";
-    var wasHidden = panel.hidden;
-    panel.hidden = false;
+    $("#panel-prev").textContent = "← " + prev.label;
+    $("#panel-next").textContent = "Next: " + next.label + " →";
     openId = id;
     if (wasHidden) { try { $("#panel-close").focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
   }
@@ -622,6 +709,7 @@
     if (panel.hidden) return;
     panel.hidden = true;
     setHeader(null);
+    markCurrent(use3D ? window.Map3D.isInside() : -1);
     if (use3D) window.Map3D.setPaused(false);
     openId = null;
     try { mapEl.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
@@ -681,20 +769,23 @@
     h += '<div><div class="label">Focus</div><div class="chip-row" style="margin-top:8px">' +
       P.badges.map(function (b) { return '<span class="chip' + (/^\[.*\]$/.test(b) ? "" : " chip-amber") + '">' + esc(b) + "</span>"; }).join("") + "</div></div>";
     h += '<div class="btn-row">' +
-      (socialHref(email) ? '<a class="t-btn t-btn-amber" href="' + esc(socialHref(email)) + '">EMAIL ME</a>' : "") +
-      (cvPdf ? '<a class="t-btn" href="' + esc(cvPdf) + '" target="_blank" rel="noopener">RESUME (PDF)</a>' : "") +
-      (classic ? "" : '<a class="t-btn" href="#s/socials">ALL SOCIALS</a>') + "</div>";
+      (socialHref(email) ? '<a class="t-btn t-btn-amber" href="' + esc(socialHref(email)) + '">Email me</a>' : "") +
+      (cvPdf ? '<a class="t-btn" href="' + esc(cvPdf) + '" target="_blank" rel="noopener noreferrer">Resume (PDF)</a>' : "") +
+      (classic ? "" : '<a class="t-btn" href="#s/socials">All socials</a>') + "</div>";
     return h;
   }
 
+  // shown with every pitch: these are student exercises, not advice
+  var DISCLAIMER = '<p class="disclaimer">Student work for learning purposes - not investment advice. Ratings, targets and figures are as of each pitch date. <a href="#legal/terms">Read the terms</a></p>';
+
   function renderPitchList(s, classic) {
-    var h = s.intro ? '<p class="sec-intro">' + esc(s.intro) + "</p>" : "";
+    var h = (s.intro ? '<p class="sec-intro">' + esc(s.intro) + "</p>" : "") + DISCLAIMER;
     if (classic) {
       P.pitches.forEach(function (p) { h += renderPitchCard(p); });
       return h;
     }
     h += '<div class="p-table" role="table" aria-label="Pitches">' +
-      '<div class="p-row p-head" role="row"><span>TICKER</span><span>COMPANY</span><span class="p-sector">SECTOR</span><span>CALL</span><span class="p-go">TARGET</span></div>';
+      '<div class="p-row p-head" role="row"><span>Ticker</span><span>Company</span><span class="p-sector">Sector</span><span>Call</span><span class="p-go">Target</span></div>';
     P.pitches.forEach(function (p) {
       h += '<button type="button" class="p-row" role="row" data-pitch="' + esc(p.id) + '">' +
         '<span class="p-tick">' + esc(p.ticker) + '</span><span class="p-name">' + esc(p.company) + "</span>" +
@@ -712,19 +803,19 @@
       '</div><span class="chip ' + callClass(p.call) + '">' + esc(p.call) + "</span></div>" +
       "<p>" + esc(p.thesis) + "</p>" +
       (p.points && p.points.length ? "<ul>" + p.points.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : "") +
-      (p.pdf ? '<a href="' + esc(p.pdf) + '" target="_blank" rel="noopener">Full pitch (PDF) →</a>' : "") + "</div>";
+      (p.pdf ? '<a href="' + esc(p.pdf) + '" target="_blank" rel="noopener noreferrer">Full pitch (PDF) →</a>' : "") + "</div>";
   }
 
   function renderPitch(p) {
     if (!p) return "<p>Pitch not found.</p>";
-    var h = '<button type="button" class="t-btn" data-back style="align-self:flex-start">◀ ALL PITCHES</button>';
+    var h = '<button type="button" class="t-btn" data-back style="align-self:flex-start">← All pitches</button>';
     h += '<div class="pd-top"><div><div class="pd-tick">' + esc(p.ticker) + (p.exchange ? ' <span class="pd-exch">' + esc(p.exchange) + "</span>" : "") + '</div><div class="pd-name">' + esc(p.company) + "</div></div>" +
-      '<div class="chip-row"><span class="chip ' + callClass(p.call) + '">' + esc(p.call) + '</span><span class="chip">TARGET ' + esc(p.target) + "</span>" +
+      '<div class="chip-row"><span class="chip ' + callClass(p.call) + '">' + esc(p.call) + '</span><span class="chip">Target ' + esc(p.target) + "</span>" +
       '<span class="chip">' + esc(p.sector) + '</span><span class="chip">' + esc(p.jurisdiction) + "</span></div></div>";
     var metaBits = [];
-    if (p.date) metaBits.push("PITCHED " + esc(p.date).toUpperCase());
-    if (p.team) metaBits.push("TEAM PITCH · " + esc(p.team).toUpperCase());
-    if (p.role) metaBits.push("MY ROLE: " + esc(p.role).toUpperCase());
+    if (p.date) metaBits.push("Pitched " + esc(p.date));
+    if (p.team) metaBits.push("Team pitch · " + esc(p.team));
+    if (p.role) metaBits.push("My role: " + esc(p.role));
     if (metaBits.length) h += '<div class="meta pd-meta">' + metaBits.join("<br>") + "</div>";
     h += '<div class="box"><div class="label">Thesis</div><p>' + esc(p.thesis) + "</p></div>";
     if (p.metrics && p.metrics.length) {
@@ -739,9 +830,9 @@
       }).join("") + "</div>";
     }
     h += '<div class="btn-row">' + (p.pdf
-      ? '<a class="t-btn t-btn-amber" href="' + esc(p.pdf) + '" target="_blank" rel="noopener">FULL PITCH (PDF)</a>'
-      : '<span class="t-btn is-disabled">FULL PITCH (PDF) — COMING SOON</span>') + "</div>";
-    return h;
+      ? '<a class="t-btn t-btn-amber" href="' + esc(p.pdf) + '" target="_blank" rel="noopener noreferrer">Full pitch (PDF)</a>'
+      : '<span class="t-btn is-disabled">Full pitch (PDF) - coming soon</span>') + "</div>";
+    return h + DISCLAIMER;
   }
 
   function paras(t) {
@@ -759,7 +850,7 @@
         (it.bullets && it.bullets.length ? "<ul>" + it.bullets.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" : "") +
         (it.skills && it.skills.length ? '<div class="chip-row skill-tags" aria-label="Transferable skills">' +
           it.skills.map(function (k) { return '<span class="chip chip-amber">' + esc(k) + "</span>"; }).join("") + "</div>" : "") +
-        (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener">' + esc(it.linkLabel || "See more") + " →</a>" : "") + "</div>";
+        (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener noreferrer">' + esc(it.linkLabel || "See more") + " →</a>" : "") + "</div>";
     });
     return h;
   }
@@ -770,8 +861,8 @@
       return '<div class="hl"><span class="hl-kind">' + esc(r.kind) + "</span><span>" + esc(r.text) + "</span></div>";
     }).join("") + "</div>";
     h += '<div class="btn-row">' + (s.pdf
-      ? '<a class="t-btn t-btn-amber" href="' + esc(s.pdf) + '" target="_blank" rel="noopener">DOWNLOAD RESUME (PDF)</a>'
-      : '<span class="t-btn is-disabled">RESUME PDF — COMING SOON</span>') + "</div>";
+      ? '<a class="t-btn t-btn-amber" href="' + esc(s.pdf) + '" target="_blank" rel="noopener noreferrer">Download resume (PDF)</a>'
+      : '<span class="t-btn is-disabled">Resume PDF - coming soon</span>') + "</div>";
     return h;
   }
 
@@ -789,7 +880,7 @@
     s.links.forEach(function (l) {
       var href = socialHref(l);
       var sub = href ? l.url.replace(/^mailto:/, "").replace(/^https?:\/\/(www\.)?/, "") : "Coming soon";
-      h += '<a class="social' + (href ? "" : " is-disabled") + '" href="' + esc(href || "#") + '"' + (href && l.kind !== "email" ? ' target="_blank" rel="noopener"' : "") + ">" +
+      h += '<a class="social' + (href ? "" : " is-disabled") + '" href="' + esc(href || "#") + '"' + (href && l.kind !== "email" ? ' target="_blank" rel="noopener noreferrer"' : "") + ">" +
         '<span class="social-icon">' + icon(SOCIAL_ICONS[l.kind] || SOCIAL_ICONS.other, 20) + "</span>" +
         '<span class="social-text"><span class="social-label">' + esc(l.label) + '</span><span class="social-sub">' + esc(sub) + "</span></span></a>";
     });
@@ -801,10 +892,11 @@
      ===================================================================== */
   function renderClassic() {
     var h = '<div class="classic-hero">' + (P.photo ? '<img class="classic-photo" src="' + esc(P.photo) + '" alt="' + esc(P.name) + '">' : "") +
-      "<div><h1><span>" + esc(SITE_TITLE.toUpperCase()) + "</span></h1>" + (P.title ? '<p class="meta">' + esc(P.title) + "</p>" : "") + "</div></div>";
+      "<div><h1><span>" + esc(SITE_TITLE) + "</span></h1>" + (P.title ? '<p class="meta">' + esc(P.title) + "</p>" : "") + "</div></div>";
     P.sections.forEach(function (s, i) {
-      h += '<section class="classic-sec"><h2>' + (i + 1) + " · " + esc(s.label.toUpperCase()) + "</h2>" + renderSection(s, null, true) + "</section>";
+      h += '<section class="classic-sec"><h2>' + (i + 1) + " · " + esc(s.label) + "</h2>" + renderSection(s, null, true) + "</section>";
     });
+    h += '<p class="meta"><a href="#legal">Privacy, terms &amp; accessibility</a> · © 2026 ' + esc(P.name) + "</p>";
     $("#classic-body").innerHTML = h;
   }
 
@@ -827,16 +919,18 @@
       name: P.shortName || P.name.split(" ")[0],
       visited: visited,
       portfolio: P,
-      onActive: function (i, text) { setActive(i === null ? null : nodes[i], text); },
+      onActive: function (i, text) { setActive(i === null ? null : nodes[i], text); markCurrent(window.Map3D.isInside()); },
       onOpen: function (i, hash, entry) { pendingEntry = entry == null ? null : entry; location.hash = hash || "s/" + P.sections[i].id; },
       onVisit: function (i) { markVisited(P.sections[i].id); }
     });
+    var cv = mapEl.querySelector(".map3d-canvas");   // the 3D view is visual: point screen readers to the text version
+    if (cv) { cv.setAttribute("role", "img"); cv.setAttribute("aria-label", "A 3D city where each tower is a section of " + P.name + "'s portfolio. The text version has all the same content."); }
   }
   // switch between the 3D map and the original 2D map
   var base = location.pathname;
   Array.prototype.forEach.call(document.querySelectorAll("[data-map-switch]"), function (a) {
     a.href = use3D ? base + "?map=2d#map" : base + "#map";
-    a.innerHTML = use3D ? "<kbd>M</kbd> 2D MAP" : "<kbd>M</kbd> 3D MAP";
+    a.innerHTML = use3D ? "<kbd>M</kbd> 2D map" : "<kbd>M</kbd> 3D city";
   });
   Array.prototype.forEach.call(document.querySelectorAll(".only-3d"), function (el) { el.hidden = !use3D; });
   var bootSwitch = document.getElementById("boot-2d");

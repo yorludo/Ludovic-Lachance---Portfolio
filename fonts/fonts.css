@@ -1,0 +1,12 @@
+/* Fonts served from this site (no requests to Google). Licensed under the SIL Open Font License 1.1 - see the *-OFL.txt files in this folder. */
+@font-face { font-family: "DM Sans"; font-style: normal; font-display: swap; font-weight: 400; src: url(dm-sans-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-display: swap; font-weight: 500; src: url(dm-sans-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-display: swap; font-weight: 600; src: url(dm-sans-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-display: swap; font-weight: 700; src: url(dm-sans-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-display: swap; font-weight: 800; src: url(dm-sans-latin-800-normal.woff2) format("woff2"); }
+@font-face { font-family: "Sora"; font-style: normal; font-display: swap; font-weight: 500; src: url(sora-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Sora"; font-style: normal; font-display: swap; font-weight: 600; src: url(sora-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Sora"; font-style: normal; font-display: swap; font-weight: 700; src: url(sora-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Sora"; font-style: normal; font-display: swap; font-weight: 800; src: url(sora-latin-800-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-display: swap; font-weight: 500; src: url(jetbrains-mono-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-display: swap; font-weight: 700; src: url(jetbrains-mono-latin-700-normal.woff2) format("woff2"); }
