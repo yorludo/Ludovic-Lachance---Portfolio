@@ -650,6 +650,7 @@
   function showWelcome() {
     if (welcomeSeen() || !$("#panel").hidden) return;
     $("#welcome").hidden = false;
+    $("#consent").hidden = true;   // the storage notice waits until the welcome card is closed
     if (use3D) window.Map3D.setPaused(true);
     setTimeout(function () { $("#welcome-explore").focus(); }, 50);
   }
@@ -657,6 +658,7 @@
     if ($("#welcome").hidden) return;
     $("#welcome").hidden = true;
     welcomeDone = true; store(WELCOME_KEY, "1");
+    if (!storageChoice()) $("#consent").hidden = false;
     if (use3D && $("#panel").hidden) window.Map3D.setPaused(false);
     mapEl.focus();
   }
